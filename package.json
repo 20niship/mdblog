@@ -1,0 +1,22 @@
+{
+  "name": "mdblog",
+  "version": "1.0.0",
+  "description": "## features",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "connect-busboy": "^1.0.0",
+    "ejs": "^3.1.6",
+    "elasticsearch": "^16.7.2",
+    "express": "^4.17.2",
+    "express-elasticsearch-session": "^0.2.0",
+    "express-session": "^1.17.2",
+    "socket.io": "^4.4.1"
+  }
+}

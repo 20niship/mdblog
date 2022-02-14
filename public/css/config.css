@@ -1,0 +1,80 @@
+
+/* ---------------------------  表のソートで矢印表示  -------------------------*/
+
+details {
+	background-color: #337;
+  border-radius: 10px;
+  padding-left: 3px;
+  margin:8px;
+  border-left: solid 1px #ccc;
+}
+
+.detail-inner{
+  padding-left: 30px;
+	background-color: #225;
+}
+
+summary {
+	position: relative;
+	cursor: pointer;
+  padding:10px;
+	list-style: none;
+  width:100%;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+details:hover {
+  background-color: #1e4e8a;
+}
+
+.usergroup-summary-continer{
+  display: table;
+  vertical-align:top;
+  align-self:flex-start;
+}
+
+.usergroup-summary-box{
+  display: table-cell;
+  padding:5px 10px;
+  margin:0;
+}
+
+.user-icon{
+  vertical-align: middle;
+  width:40px;
+}
+.user-icon i{
+  font-size:35px;
+  padding-right: 20px;
+  text-align: center;
+  color:#fff;
+}
+
+.user-name{
+  width:200px;
+}
+.user-info{
+  width:100px;
+}
+
+.user-name p, .user-info p{
+  padding:0;
+  margin:0;
+}
+
+
+.usergroup-name{
+  font-weight: bold;
+  font-size:2.0rem;
+ 
+}
+
+.user-users{
+  height: 100%;
+  justify-content: space-around;
+  overflow: hidden;
+}
+

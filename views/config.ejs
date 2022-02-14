@@ -1,0 +1,561 @@
+
+<htmL>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/config.css" />
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+    <script src="/static/js/mymessage.js" type="text/javascript"></script>
+    <title><%- title %></title>
+  </head>
+  
+  <body>
+    <div id="pagetop" style="width:0;height:0;"></div>
+    <header class="site-header">
+      <div class="header_wrapper">
+        <div class="header_start">
+          <img src="/file/logo.png" width=50 class="h_logo"/>
+          <a href="/" class="h_title"><%- title %></a>
+          <span class="h_desc"><%- description %></span>
+        </div>
+  
+        <div class="header_end">
+          <div class="h_search">
+            <form action = "/search" class="search-form" method = “get”>
+              <input type="text" class="searchTerm" name="q" placeholder="What are you looking for?">
+              <input type="submit" class="searchButton" value="&#xf002">
+            </form>
+          </div>
+          
+          <nav class="header_nav">
+            <ul class="h_nav_wrapper">
+              <li class="h_nav_item"><a href="/">Home</a></li>
+              <li class="h_nav_item"><a href="/mypage">MyPage</a></li>
+              <li class="h_nav_item"><a href="#">WorkShop</a></li>
+              <li class="h_nav_item"><a href="/RC2021">RC2021</a></li>
+              <li class="h_nav_item"><a href="/F3RC2021">F3RC2021</a></li>
+  <% if (username !== 'undefined') { %>
+              <li class="h_nav_item"><a href="/user/logout">Logout</a></li>
+  <% } else { %>
+              <li class="h_nav_item"><a href="/user/login">Login</a></li>
+  <% } %>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+  
+
+<main style="margin-top:60px;">
+<% if (show_no_admin_error) { %>
+    <h1>You are not admin user</h1>
+    <h2>Please login as an admin user</h2>
+
+<% } else { %>
+  <h1><%- page_title %></h1>
+  <% if (page === 'list') { %>
+    <table>
+      <tbody>
+          <tr><td><a href="/special/config/user">User config</a></td>
+              <td>ユーザー情報の設定を行います。</td>
+          </tr>
+          <tr><td><a href="/special/config/usergroup">Usergroup config</a></td>
+              <td>ユーザーグループ情報の設定を行います。</td>
+          </tr>
+          <tr><td><a href="/special/config/page">Page config</a></td>
+              <td>ページの設定を行います。</td>
+          </tr>
+      </tbody>
+    </table>
+
+  <h1>一般config情報</h1>
+  <p>ココの内容を編集するには、<code>/app/config.js</code>を編集して下さい。</p>
+
+  <p>全般設定</p>
+  <table>
+    <tbody>
+      <tr><td>タイトル</td><td><%- config.general.title %></td></tr>
+      <tr><td>説明</td><td><%- config.general.description%></td></tr>
+      <tr><td>URL</td><td><%- config.general.url %></td></tr>
+      <tr><td>Port</td><td><%- config.general.port %></td></tr>
+      <tr><td>expireTime</td><td><%- config.general.expireTime %></td></tr>
+      <tr><td>defaultSearchReslut</td><td><%- config.general.defaultSearchReslut %></td></tr>
+    </tbody>
+  </table>
+
+  <p>データベース</p>
+  <table>
+    <tbody>
+      <tr><td>host</td><td><%- config.database.host %></td></tr>
+      <tr><td>port</td><td><%- config.database.port%></td></tr>
+      <tr><td>dbname</td><td><%- config.database.dbname %></td></tr>
+      <tr><td>user</td><td><%- config.database.user %></td></tr>
+      <tr><td>password</td><td>●●●●●●●●●●●</td></tr>
+      <tr><td>engine</td><td><%- config.database.engine %></td></tr>
+    </tbody>
+  </table>
+
+  <p>ユーザー設定</p>
+  <table>
+    <tbody>
+      <tr><td>ログインせずに閲覧許可</td><td><%- config.user.AllowViewWithoutLogin %></td></tr>
+      <tr><td>ログインなしで編集</td><td><%- config.user.AllowEditWithoutLogin%></td></tr>
+      <tr><td>ログインなしで削除</td><td><%- config.user.AllowDeleteWithoutLogin %></td></tr>
+      <tr><td>2段階認証を使用</td><td><%- config.user.UseTwoStepVerification %></td></tr>
+      <tr><td>最大ユーザー数</td><td>config.user.MaxUserNumber</td></tr>
+    </tbody>
+  </table>
+
+  <p>ページ設定</p>
+  <table>
+    <tbody>
+      <tr><td>メインページ</td><td><%- config.pages.mainPage %></td></tr>
+    </tbody>
+  </table>
+
+  <p>ディレクトリ設定</p>
+  <table>
+    <tbody>
+      <tr><td>画像ファイル保存場所</td><td><%- config.dirs.mediaFileDir %></td></tr>
+      <tr><td>ロゴ画像</td><td><%- config.dirs.logoImg %></td></tr>
+      <tr><td>アップロードできる拡張子</td><td><%- config.dirs.acceptUploadFileExtention %></td></tr>
+    </tbody>
+  </table>
+
+
+
+  <% } else if (page === 'user') { %>
+    <%# --------------------------------------------------------------%>
+    <%# ----                  User Settings                    -------%>
+    <%# --------------------------------------------------------------%>
+
+    <p>ユーザー数：<%- user_list.length %></p>
+    <p>theadをクリックすると、その値でソートできます。</p>
+    <table id="users">
+      <thead>
+        <tr>
+          <td class="sort" data-sort="td_userid">ユーザID</td>
+          <td class="sort" data-sort="td_name">ユーザ名</td>
+          <td class="sort" data-sort="td_gender">性別</td>
+          <td class="sort" data-sort="td_date">登録日</td>
+          <td class="sort" data-sort="td_icon">アイコン</td>
+          <td class="sort" data-sort="td_nedit">編集回数</td>
+          <td class="sort" data-sort="td_pubmail">PublicEmail</td>
+          <td class="sort" data-sort="td_enabled">Enabled</td>
+          <td class="sort" data-sort="td_admin">admin</td>
+          <td >変更</td>
+          <td >削除</td>
+        </tr>
+      </thead>
+      <tbody id="datatable" class="list">
+        <% user_list.forEach((user) => { %>
+          <tr>
+            <% let obj =  Object.values(user) %>
+            <td class="td_userid"><%- user.user_id %></td>
+            <td class="td_name"><%- user.user_name %></td>
+            
+            <% if (user.user_gender === 0) { %><td class="td_gender">未登録</td>
+            <% } else if (user.user_gender === 1) { %><td class="td_gender">Male</td>
+            <% } else if (user.user_gender === 2) { %><td class="td_gender">Female</td>
+            <% } else { %><td class="td_gender">Unknown</td><% } %>
+            
+            <td class="td_date"><%- user.user_registration.toLocaleString('ja-JP', {}) %></td>
+            <td class="td_icon"><%- user.user_icon %></td>
+            <td class="td_nedit"><%- user.user_editcount %></td>
+            <td class="td_pubmail"><%- user.user_emailable %></td>
+            <td class="td_enabled"><%- user.user_enabled %></td>
+            <td class="td_admin"><%- user.user_admin %></td>
+            <td><button class="form-submit-btn-small" onclick="open_config_user(<%- obj[0] %> )">編集</button></td>
+            <td><button class="form-submit-btn-small" onclick="delete_user( <%- obj[0] %> )">削除</button></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <div class="popup user-config" id="popup-user-config" style="visibility:hidden;">
+      <div class="popup-inner my-form">
+        <button class="popup-close-btn" onclick="close_config_user()"><i class="fas fa-times"></i></button>
+        <p class="my-form-title">Change User Input</p>
+
+        <!-- <form> -->
+          <input type="hidden" id="user_id" name="user_id" value="">
+
+          <label for="user_name">ユーザー名</label><br>
+          <input type="text" id="user_name" name="user_name" value="name"><br>
+
+          <label for="user_email">メールアドレス</label><br>
+          <input type="text" id="user_email" name="user_email" value="email"><br><br>
+
+          <label for="アイコンURL">アイコンURL</label><br>
+          <input type="text" id="user_icon" name="user_icon" value="email"><br><br>
+
+
+          <label for="gender">性別</label>
+          <select name="gender" id="user_gender">
+              <option value="0">--Please choose an option--</option>
+              <option value="1">Male</option>
+              <option value="2">Female</option>
+          </select>
+
+          <input type="checkbox" id="user_publicmail" name="user_publicmail">
+          <label for="user_publicmail">Public Email</label>
+
+          <input type="checkbox" id="user_admin" name="user_admin">
+          <label for="user_admin">Admin</label>
+
+          <input type="checkbox" id="user_enabled" name="user_enabled">
+          <label for="user_enabled">Enabled</label>
+          
+          <button class="form-submit-btn-small" onclick="edit_user()">更新</button>
+        <!-- </form>  -->
+      </div>
+    </div>
+    <script>
+      const delete_user = async(id)=>{
+        if (window.confirm("ユーザー" + id.toString() + "を削除しますか？")) {
+          let response = await fetch("/api/user", {
+                method:"POST", headers: {'Content-Type': 'application/json'},
+                body:JSON.stringify({query:"deleteuser", user_id:id})
+              })
+          if(response.status !== 200){
+            console.log("Some error occuerd :", response.text())
+          }else{
+            console.log("OK!", response.text())
+            document.location.reload();
+          }
+        }
+      }
+
+      const edit_user = async(id) => {
+        const input_username = document.getElementById("user_name")
+        const input_email    = document.getElementById("user_email")
+        const input_icon     = document.getElementById("user_icon")
+        const input_gender   = document.getElementById("user_gender")
+        const input_emailable = document.getElementById("user_publicmail")
+        const input_admin = document.getElementById("user_admin")
+        const input_user_enabled = document.getElementById("user_enabled")
+        const input_user_id = document.getElementById("user_id")
+
+        const fields = { 
+          query           : "edituser", 
+          user_id         : input_user_id.value,
+          user_name       : input_username.value,
+          user_gender     : input_gender.value,
+          user_icon       : input_icon.value,
+          user_email      : input_email.value,
+          // user_password   : input_username.value,
+          user_publicmail : input_emailable.checked,
+          user_admin      : input_admin.checked,
+          user_enabled    : input_user_enabled.checked
+        }
+        console.log(JSON.stringify(fields));
+
+        let response = await fetch("/api/user", {
+          method:"POST", headers: {'Content-Type': 'application/json'},
+          body:JSON.stringify(fields)
+        })
+
+        if(response.status !== 200){
+          console.log("Some error occuerd :", response.text())
+        }else{
+          console.log("OK!", response.text())
+          document.location.href = window.location.href.split('?')[0];
+        }
+      }
+
+      const get_user_data = async(id) => {
+        let user_data= [];
+        const all_user_data = await document.getElementById("datatable").getElementsByTagName('tr');
+        for(let i=0; i<all_user_data.length; i++){
+          const ud = await all_user_data[i].getElementsByTagName("td");
+          console.log(ud[0].innerText, id)
+          if(ud.length > 0 && ud[0].innerText === id.toString()){
+            for(let j=0; j<ud.length;j++){
+              await user_data.push(ud[j].innerText)
+            }
+            return user_data;
+          }
+        }
+        return [];
+      }
+
+
+      const open_config_user = async(id)=>{
+        const input_username = document.getElementById("user_name")
+        const input_email    = document.getElementById("user_email")
+        const input_icon     = document.getElementById("user_icon")
+        const input_gender   = document.getElementById("user_gender")
+        const input_emailable = document.getElementById("user_publicmail")
+        const input_admin = document.getElementById("user_admin")
+        const input_user_id = document.getElementById("user_id")
+        const input_user_enabled = document.getElementById("user_enabled")
+
+        const user_data = await get_user_data(id);
+        if(user_data.length === 0){
+          console.log("Undefined User ")
+        }
+
+        input_username.value = user_data[1];
+        input_email.value = "";
+        input_icon.value = user_data[4];
+        input_gender.value = user_data[2];
+        input_user_id.value = id;
+
+        input_emailable.checked = user_data[6] === "1";
+        input_user_enabled.checked = user_data[8] === "1";
+        input_admin.checked = user_data[9] === "1";
+
+        let popup = document.getElementById('popup-user-config');
+        popup.style.visibility = "visible";
+      }
+
+      const close_config_user = ()=>{
+        let popup = document.getElementById('popup-user-config');
+        popup.style.visibility = "hidden";
+      }
+
+    </script>
+            
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+    <script>
+      var options = {
+        valueNames: [ 'td_userid', 'td_name', "td_gender", "td_date", "td_nedit", "td_pubmail", "td_enabled", "td_icon", "td_admin"]
+      };
+      var userList = new List('users', options);
+      userList.sort( 'td_userid', {order : 'asc' });
+    </script>
+
+
+  <% } else if (page === 'usergroup') { %>
+    <%# --------------------------------------------------------------%>
+    <%# ----                  UserGroup Settings               -------%>
+    <%# --------------------------------------------------------------%>
+
+    <p>グループ数：<%- relation_data.length %></p>
+    <p>theadをクリックすると、その値でソートできます。</p>
+
+    <h2>グループ作成</h2>
+      <div class="my-form my-form-oneline" style="max-width:600px">
+        <div class="search-ui-component">
+          <input type="text" id="usergroup-input" placeholder="グループ名">
+          <button type="submit" class="favorite styled" onclick="createGroup()">作成する</button>
+        </div>
+      </div>
+
+    <h2>グループ一覧</h2>
+
+    <% relation_data.forEach((group) => { %>
+
+    <details>
+      <summary class="usergroup-summary-continer">
+        <div class="usergroup-summary-box user-icon">
+  <% if ( group.usergroup_enabled === 1) { %>
+          <i class="fas fa-users"></i>
+  <% }else { %>
+          <i class="fas fa-users-slash"></i>
+  <% } %>
+          </div>
+        <div class="usergroup-summary-box user-name">
+          <p><span class="usergroup-name"><%- group.usergroup_name %> </span><span>ID : <%- group.usergroup_id %></span></p>
+          <p >Registered : <%- group.usergroup_registration.toLocaleString('ja-JP', {}) %></p>
+        </div>
+        <div class="usergroup-summary-box user-info">
+          <p>Menber：<%- group.users.length %>人</p>
+          <p>Enabled : <%- group.usergroup_enabled %></p>
+        </div>
+        <div class="usergroup-summary-box user-users">
+          <span ><%- group.user_string %></span>
+        </div>
+      </summary>
+    <div class="detail-inner">
+
+    <div class="usergroup-summary-continer">
+      <div class="usergroup-summary-box">
+    <table id="users">
+      <thead>
+        <tr>
+          <td class="sort" data-sort="td_userid">ユーザID</td>
+          <td class="sort" data-sort="td_name">ユーザ名</td>
+          <td class="sort" data-sort="td_icon">アイコン</td>
+          <td class="sort" data-sort="td_admin">admin</td>
+          <td >削除</td>
+        </tr>
+      </thead>
+      <tbody id="datatable" class="list">
+        <% group.users.forEach((user) => { %>
+          <tr>
+            <td class="td_userid"><%- user.user_id %></td>
+            <td class="td_name"><%- user.user_name %></td>
+            <td class="td_icon"><%- user.user_icon %></td>
+            <td class="td_admin"><%- user.user_admin %></td>
+            <td><button onclick="delete_user_from_group( <%- user.user_id %>, <%- group.usergroup_id %> )">削除</button></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+      <input type="hidden" name="usergroup_id" value="<%- group.usergroup_id %>">
+      <div class="form-submit-btn-oneline">
+        <input type="text" id="add-user-name-<%- group.usergroup_id %>" list="allusers" class="input-text-with-btn" placeholder="追加するユーザー名"><br>
+        <datalist id="allusers">
+        </datalist>
+        <button onclick="add_user_to_grouop(<%- group.usergroup_id %>)" class="form-submit-btn-oneline">追加</button>
+      </div>
+    </div>
+    <div class="usergroup-summary-box my-form">
+        <p class="form-title">Change Usergroup Settings</p>
+          <label for="usergroup_name">新しいグループ名</label><br>
+          <input type="text" id="usergroup_name-<%- group.usergroup_id %>" name="usergroup_name" value="<%- group.usergroup_name %>"><br>
+
+          <label for="アイコンURL">アイコンURL</label><br>
+          <input type="text" id="usergroup_icon-<%- group.usergroup_id %>" name="usergroup_icon" value="Not implemented yet"><br><br>
+
+          <input type="checkbox" id="group_enabled-<%- group.usergroup_id %>" name="group_enabled" <% if ( group.usergroup_enabled === 1) {%> checked <% } %>  >
+          <label for="group_enabled">Enabled</label>
+          <button onclick="delete_usergroup(<%- group.usergroup_id %>)" class="form-submit-btn-small">削除</button>
+          <button onclick="edit_usergroup(<%- group.usergroup_id %>)" class="form-submit-btn-small">更新</button>
+        </div>
+    </div>
+    </details>
+    <% }) %>
+    <script>
+      const delete_user_from_group = async(user_id, group_id) => {
+        if (window.confirm("ユーザー" + user_id.toString() + "をグループ" + group_id + "から削除しますか？")) {
+          const fields = {query:"deleteuserfromgroup", user_id:user_id, usergroup_id:group_id};
+          let response = await fetch("/api/user", {
+                method:"POST", headers: {'Content-Type': 'application/json'},
+                body:JSON.stringify(fields)
+              })
+          if(response.ok){
+            console.log("OK!", response.text())
+            document.location.reload();
+          }else{
+            console.log("Some error occuerd :", response.text())
+          }
+        }
+      }
+       
+      const edit_user = async(id) => {
+        const input_username = document.getElementById("user_name")
+        const input_email    = document.getElementById("user_email")
+        const input_icon     = document.getElementById("user_icon")
+        const input_gender   = document.getElementById("user_gender")
+        const input_emailable = document.getElementById("user_publicmail")
+        const input_admin = document.getElementById("user_admin")
+        const input_user_enabled = document.getElementById("user_enabled")
+        const input_user_id = document.getElementById("user_id")
+
+        const fields = { 
+          query           : "edituser", 
+          user_id         : input_user_id.value,
+          user_name       : input_username.value,
+          user_gender     : input_gender.value,
+          user_icon       : input_icon.value,
+          user_email      : input_email.value,
+          // user_password   : input_username.value,
+          user_publicmail : input_emailable.checked,
+          user_admin      : input_admin.checked,
+          user_enabled    : input_user_enabled.checked
+        }
+        console.log(JSON.stringify(fields));
+
+        let response = await fetch("/api/user", {
+          method:"POST", headers: {'Content-Type': 'application/json'},
+          body:JSON.stringify(fields)
+        })
+
+        if(response.status !== 200){
+          console.log("Some error occuerd :", response.text())
+        }else{
+          console.log("OK!", response.text())
+          document.location.href = window.location.href.split('?')[0];
+        }
+      }
+
+      const add_user_to_grouop = async(group_id) => {
+        const name = document.getElementById(`add-user-name-${group_id}`).value;
+        const fields = {query:"addusertogroup", user_name:name, usergroup_id:group_id};
+        let response = await fetch("/api/user", {
+              method:"POST", headers: {'Content-Type': 'application/json'},
+              body:JSON.stringify(fields)
+            })
+        if(response.status !== 200){
+          console.log("Some error occuerd :", response.text())
+        }else{
+          console.log("OK!", response.text())
+          document.location.reload();
+        }
+      }
+
+      const edit_usergroup = async(group_id) => {
+        const fields = { 
+          query             : "editusergroup", 
+          usergroup_id      : group_id,
+          usergroup_name    : document.getElementById(`usergroup_name-${group_id}`).value,
+          usergroup_enabled : document.getElementById(`group_enabled-${group_id}`).checked,
+          usergroup_icon    : document.getElementById(`usergroup_icon-${group_id}`).value,
+        }
+        console.log(fields);
+
+        let response = await fetch("/api/user", {
+          method:"POST", headers: {'Content-Type': 'application/json'},
+          body:JSON.stringify(fields)
+        })
+
+        if(response.status !== 200){
+          MyMessage({msg:"ERROR 保存できませんでした : " + response.statusText, type:"alert"})
+        }else{
+          MyMessage({msg:"ユーザーグループを保存しました", type:"simple"})
+          document.location.href = window.location.href.split('?')[0];
+        }
+      }
+
+      const delete_usergroup = async(group_id) => {
+        const response = await fetch("/api/user", {
+          method:"POST", headers: {'Content-Type': 'application/json'},
+          body:JSON.stringify({query:"deleteusergroup", usergroup_id:group_id})
+        })
+        if(response.ok){
+          document.location.reload();
+        }else{
+          MyMessage({msg:"グループ削除に失敗しました", duration:3000})
+        }
+      }
+
+      const createGroup = async() => {
+        const new_group_name = document.getElementById("usergroup-input").value;
+        const response = await fetch("/api/user", {
+          method:"POST", headers: {'Content-Type': 'application/json'},
+          body:JSON.stringify({query:"createusergroup", usergroup_name:new_group_name})
+        })
+        if(response.ok){
+          document.location.reload();
+        }else{
+          MyMessage({msg:"グループ作成に失敗しました", duration:3000})
+        }
+      }
+
+      window.onload = async() => {
+        let all_users = []
+        const response = await fetch("/api/user", {
+          method:"POST", headers: {'Content-Type': 'application/json'},
+          body:JSON.stringify({query:"getallusers"})
+        })
+        all_users = await response.json()
+        var hoge = document.getElementById("allusers");
+        for(i in all_users){
+            let newUser = document.createElement("option"); // p要素作成
+            newUser.setAttribute("value",all_users[i].user_name); // p要素にidを設定
+            hoge.appendChild(newUser);
+        }
+      }
+    </script>
+
+    <% } else if (page === 'page') { %>
+    <h1>Page settings</h1>
+    <h2>工事中、、、</h2>
+  <% } else { %>
+    <h1>505 - Internal Server Error</h1>    
+  <% } %>
+<% } %>
+  </body>
+</htmL>
