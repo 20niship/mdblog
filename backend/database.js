@@ -1,7 +1,5 @@
 
 const elasticsearch = require('elasticsearch');
-
-
 const logger =  require("./logger");
 const config = require("./config");
 
@@ -156,8 +154,15 @@ class DBManager{
   }
 
   async get_page_by_title(title){
-      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "title": title } } }  })
-      return res.hits?.hits;
+      // const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "title": title } } }  })
+      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "TITLE": title } } }  })
+      if( res.hits.hits.length === 0) { return {}; }
+      return res.hits?.hits[0];
+  }
+  
+  async custom_search(query){
+    const res = await this.client.search({index:"mdblog_page", body:query});
+    return res.hits?.hits;
   }
 
   async get_page_by_id(pageid){

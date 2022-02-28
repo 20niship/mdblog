@@ -1,9 +1,7 @@
 
-var logger = require("../backend/logger");
 var router = require("express").Router();
 var dbObj = require("../backend/database");
 const config = require("../backend/config");
-const ejs = require("ejs");
 const md2html = require("../public/js/parser")
 
 router.get("/", (req, res) => {
@@ -21,25 +19,24 @@ router.get("/*", async(req, res) => {
     return;
   }
   const hits = await dbObj.get_page_by_title(title);
-  const page_found = hits.length > 0;
+  const found = hits.length !== {};
   // console.log(hits)
 
-  if(req.query?.action === "edit" && page_found){
+  if(req.query?.action === "edit" && found){
     res.render("editor", { config,  page : { hits,  title }});
     return;
   }
 
   /*
   const page_id = r[0]["page_id"]
-  hasViewRight = await dbObj.hasRight(page_id, "view", req.session.username)
-  hasEditRight = await dbObj.hasRight(page_id, "edit", req.session.username)
+  has_view_right = await dbObj.hasRight(page_id, "view", req.session.username)
+  has_edit_right = await dbObj.hasRight(page_id, "edit", req.session.username)
   */
- console.log("AA = ")
- console.log(hits[0]?.content)
-  const text_encoded = page_found ? md2html(hits[0]?._source?.content) : ""
+  // const text_encoded = found ? md2html(hits?._source?.content) : ""
+  const text_encoded = found ? md2html(hits?._source?.text_markdown) : "";
 
-  const hasViewRight = true;
-  const hasEditRight = true;
+  const has_view_right = true;
+  const has_edit_right = true;
   
   console.log("bb")  
   const render_title_html = (_title) => {
@@ -67,28 +64,39 @@ router.get("/*", async(req, res) => {
     }
   }
   var data = {
-    main : {
+    head : {
       title:config.general.title,
-      text : "",
-      type:"page",
-      username : req?.session?.username,
-      icon:"/file/logo.png"
+      description:config.general.description,
+      keywords: "hogehoge",
+      author : "author",
+      og_title :  "検索結果 -- " + config.general.title,
+      og_url: config.general.url,
+      og_image : config.general.icon,
+      og_site_name : config.general.title,
+      title :   "検索結果 -- " + config.general.title
+    },
+    header : {
+      description : config.general.description,
+      title : config.general.title,
+      logined : true,
+      admin : true
     },
     page:{
-      page_found,
+      found,
       title : render_title_html(title),
       title_txt : title,
-      icon:"",
-      html_text : text_encoded,
-      user : hits[0]?.user,
-      category:hits.map(i => i["category_name"]),
-      c_date: formatDate(hits[0]?.create_date) ,
-      m_date: formatDate(hits[0]?.update_date),
-      page_found, hasViewRight, hasEditRight, 
+      icon:"/file/logo.png",
+      content : text_encoded,
+      username : hits?.user,
+      category:[hits?._source?.category] || [],
+      c_date: formatDate(hits?.create_date) ,
+      m_date: formatDate(hits?.update_date),
+      found, has_view_right, has_edit_right, 
       render_goto_top : config.pages.render_goto_top,
       render_lgtm_btn : config.pages.render_lgtm_btn,
     },
   };
+  console.log(data.page.category)
   res.render("main", data);
 });
 

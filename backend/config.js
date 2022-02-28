@@ -33,7 +33,8 @@ let config = {
     },
     
     pages : {
-        mainPage : encodeURI("メインページ"),
+        mainPage : encodeURI("/list"),
+        // mainPage : encodeURI("メインページ"),
         render_goto_top : true,
         render_lgtm_btn:true,
     },

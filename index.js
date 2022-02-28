@@ -92,11 +92,10 @@ if(config.general.expireTime > 0){
 app.use('/public', express.static("./public"));
 app.use('/view', require("./routes/page"))
 
-/*
 app.use("/api", require("./routes/api"))
-app.use("/search", require("./routes/search"))
+app.use("/list", require("./routes/search"))
+/*
 app.use("/upload", require("./routes/upload"));
-
 app.all("/mypage",(req, res, next) => {
   if("username" in req.session){
     res.redirect('/view/user/' + req.session["username"]);
@@ -109,10 +108,8 @@ app.all("/mypage",(req, res, next) => {
 
 app.use("/admin", require("./routes/admin"));
 
-app.all("/", (req, res, next) => {
-  res.writeHead(302, {
-    'Location': "/view/" + config.pages.mainPage
-  });
+app.all("/", (req, res) => {
+  res.writeHead(302, { 'Location': config.pages.mainPage});
   res.end();
 })
 

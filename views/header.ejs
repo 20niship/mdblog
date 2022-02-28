@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<%# description : description %>
+<%# title :  %>
+<%# logined : loginしているかどうか、T/F%>
+<%# admin : adminかどうか、T/F %>
+
+
+  <header>
+    <div class="header_wrapper">
+      <div class="header_start">
+        <img src="/file/logo.png" width=50 class="h_logo"/>
+        <a href="/" class="h_title"><%- title %></a>
+        <span class="h_desc"><%- description %></span>
+      </div>
+
+      <div class="header_end">
+        <div class="h_search">
+          <form action = "/search" class="search-form" method = “get”>
+            <input type="text" class="searchTerm" name="q" placeholder="What are you looking for?">
+            <input type="submit" class="searchButton" value="&#xf002">
+          </form>
+        </div>
+        
+        <nav class="header_nav">
+          <label for="show-header-menu" class="show-header-menu-label"><i class="fa fa-bars"></i></label>
+          <input type="checkbox" id="show-header-menu" role="button">
+          <div class="hmenu-bg" onclick="document.getElementById('show-header-menu').checked = false;"></div>
+          <ul class="h_nav_wrapper">
+            <li><a href="/">Home</a></li>
+            <li>
+              <!-- <a href="#">WorkShop</a> -->
+              <input type="checkbox" id="show-h-menu-1" role="button">
+              <label for="show-h-menu-1" class="show-header-menu-child-label">WorkShop</label>
+                <ul>
+                    <li><a href="#">投擲班</a></li>
+                    <li><a href="#">Swerve班</a></li>
+                    <li><a href="#">ROS2班</a></li>
+                    <li><a href="#">機械屋</a></li>
+                    <li><a href="#">回路屋</a></li>
+                    <li><a href="#">制御屋</a></li>
+                </ul>
+            </li>
+            <li>
+              <input type="checkbox" id="show-h-menu-2" role="button">
+              <label for="show-h-menu-2" class="show-header-menu-child-label">RC2021</label>
+              <ul>
+                <li><a href="#">投擲班</a></li>
+                <li><a href="#">Swerve班</a></li>
+                <li><a href="#">ROS2班</a></li>
+                <li><a href="#">機械屋</a></li>
+                <li><a href="#">回路屋</a></li>
+                <li><a href="#">制御屋</a></li>
+              </ul>
+            </li>
+            <li>
+              <input type="checkbox" id="show-h-menu-3" role="button">
+              <label for="show-h-menu-3" class="show-header-menu-child-label">F3RC</label>
+              <ul>
+                <li><a href="#">A班</a></li>
+                <li><a href="#">B班</a></li>
+                <li><a href="#">C班</a></li>
+                <li><a href="#">D班</a></li>
+                <li><a href="#">E班</a></li>
+                <li><a href="#">F班</a></li>
+                <li><a href="#">その他</a></li>
+              </ul>
+            </li>
+            <li>
+              <input type="checkbox" id="show-h-menu-4" role="button">
+              <label for="show-h-menu-4" class="show-header-menu-child-label">User</label>
+              <ul>
+<% if (logined) { %>
+            <li><a href="/user/logout">Logout</a></li>
+            <li><a href="/mypage">マイページ</a></li>
+            <li><a href="myedit">最近編集した記事</a></li>
+<% } else { %>
+            <li><a href="/user/login">Login</a></li>
+            <li><a href="/user/logout">Register</a></li>
+<% } %>
+              </ul>
+            </li>
+            <li>
+            <input type="checkbox" id="show-h-menu-6" role="button">
+            <label for="show-h-menu-6" class="show-header-menu-child-label">System</label>
+            <ul>
+              <li><a href="/special/performance">プロファイリング</a></li>
+              <li><a href="/special/config">About</a> </li>
+              <li><a href="/special/config/user">ユーザー設定</a> </li>
+              <li><a href="/special/config/usergroup">グループ設定</a></li>
+              <li><a href="/special/config/page">/ページ設定</a> </li>
+            </ul>
+          </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
