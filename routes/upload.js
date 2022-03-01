@@ -1,13 +1,9 @@
 
-var logger = require("../backend/logger");
 var router = require("express").Router();
 var dbObj = require("../backend/database");
-let sendError = require("./errors")
 const config = require("../backend/config");
-const fs = require("fs");
 const Fstream = require('fs-extra');             // Classic fs
 const multer = require("multer");
-const path = require('path'); 
 
 // ---------------------  multer settings ---------------------------------
 const multerStorage = multer.diskStorage({
@@ -33,7 +29,6 @@ const multerFilter = (req, file, cb) => {
     }
   }
 
-  logger.a_error("Noe an image! Please upload an image!!");
   cb(("Not accepted format", 400), false);
 }
 
@@ -66,7 +61,6 @@ router.post("/", uploader, function (req, res) {
 
 // ---------------------  multi-busboy settings ---------------------------------
 const busboy = require('connect-busboy');
-const { a_error } = require("../backend/logger");
 router.use(busboy({
     highWaterMark: 2 * 1024 * 1024, // Set 2MiB buffer
 })); 

@@ -18,6 +18,8 @@
     "express": "^4.17.2",
     "express-elasticsearch-session": "^0.2.0",
     "express-session": "^1.17.2",
+    "fs-extra": "^10.0.1",
+    "multer": "^1.4.4",
     "socket.io": "^4.4.1"
   }
 }

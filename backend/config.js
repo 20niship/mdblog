@@ -15,12 +15,12 @@ let config = {
     },
     
     database : {
-        host: "localhost",
-        port : null,
-        dbname: "mdwiki",
-        user: "test_user",
-        password: "test_password",
-        engine : "InnoDB"
+        host: "localhost:9200",
+        // port : null,
+        // dbname: "mdwiki",
+        // user: "test_user",
+        // password: "test_password",
+        // engine : "InnoDB"
     },
     
     user : {
@@ -40,7 +40,7 @@ let config = {
     },
 
     dirs : {
-        mediaFileDir : "./public/file",
+        mediaFileDir : "./public/media",
         logoImg : "",
         acceptUploadFileExtention : [
             "jpg", "png", "mpeg", "tiff", "tif", "bmp", "eps", "raw", "svg",

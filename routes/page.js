@@ -23,6 +23,7 @@ router.get("/*", async(req, res) => {
   // console.log(hits)
 
   if(req.query?.action === "edit" && found){
+  console.log("bb")  
     res.render("editor", { config,  page : { hits,  title }});
     return;
   }
@@ -38,7 +39,6 @@ router.get("/*", async(req, res) => {
   const has_view_right = true;
   const has_edit_right = true;
   
-  console.log("bb")  
   const render_title_html = (_title) => {
     let title_html = `<a href="/"><i class="fas fa-home"></i>/</a>`;
     let t_s = _title.split("/")
@@ -78,7 +78,7 @@ router.get("/*", async(req, res) => {
     header : {
       description : config.general.description,
       title : config.general.title,
-      logined : true,
+      logined : "username" in req?.session,
       admin : true
     },
     page:{
@@ -88,15 +88,14 @@ router.get("/*", async(req, res) => {
       icon:"/file/logo.png",
       content : text_encoded,
       username : hits?.user,
-      category:[hits?._source?.category] || [],
-      c_date: formatDate(hits?.create_date) ,
-      m_date: formatDate(hits?.update_date),
+      category:[hits?._source?.tag] || [],
+      c_date: formatDate(new Date(hits?._source?.create_time)) ,
+      m_date: formatDate(new Date(hits?._source?.update_time)),
       found, has_view_right, has_edit_right, 
       render_goto_top : config.pages.render_goto_top,
       render_lgtm_btn : config.pages.render_lgtm_btn,
     },
   };
-  console.log(data.page.category)
   res.render("main", data);
 });
 

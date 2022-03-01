@@ -2,6 +2,8 @@
 const elasticsearch = require('elasticsearch');
 const logger =  require("./logger");
 const config = require("./config");
+const bcrypt = require("bcrypt");
+const { param } = require('../routes/user');
 
 class DBManager{
   constructor(){
@@ -212,7 +214,32 @@ class DBManager{
       return true;
   }
 
-async getUser(user_name){
+  async register_user(username, password){
+    const hash = await bcrypt.hash(password, config.backend.salt);
+    console.log(hash, password);
+
+    if(! new RegExp(/^([a-zA-Z0-9]{4,100})$/).test(username)){
+      console.log("invalid username  : " , username);
+      return false;
+    }
+
+    const res = await this.client.index({index:"session_store", body:{username, password:hash }});
+    
+    return res;
+  }
+
+  async verify_user(username, password){
+    const res = await this.client.search({index : "session_store", body:{query:{match:{username:username}}}})
+    if(! res?.hits?.hits){ return false; }
+    if(res?.hits?.hits.length === 0) { return false; }
+    const u = res.hits.hits[0]?._source;
+    console.log(password, u?.password)
+    const cmp = await bcrypt.compare(password, u?.password.toString());
+    console.log("result = ", cmp)
+    return cmp;
+  }
+
+  async get_user_by_username(user_name){
   const sql_query = "SELECT * FROM users WHERE user_name=?";
   const [results, fields, err] = await this.connection.query(sql_query, [user_name]);
   if (err){
@@ -229,16 +256,6 @@ async getPageID(page_title){
   }
   if(results.length === 0){return ""}
   return results[0]["page_id"] || "";
-}
-
-async getUserID(username){
-  const sql_query = "SELECT user_id FROM users WHERE user_name=?";
-  const [results, fields, err] = await this.connection.query(sql_query, [username]);
-  if (err){
-    logger.a_error("Database Error : " + err);
-    return "";
-  }
-  return results[0] && results[0]["user_id"] || "";
 }
 
 async getUsergroupID(usergroup_name){

@@ -13,7 +13,7 @@ router.get("/", async(req, res) => {
 
   // s : sort (0:デフォルト（検索語区順位）、d:日程, v:Visited, s:Stard, ) dr, vr, sr (reverse)がついたときには逆順
   const params = req.query;
-  for(i in params){ console.log(i);  if(params[i] === ""){ delete params[i]; } }
+  for(i in params){ if(params[i] === ""){ delete params[i]; } }
   let search_query= {};
   const default_hit_size = 20;
   const max_hit_size = 50;
@@ -40,7 +40,6 @@ router.get("/", async(req, res) => {
      search_query["query"] ={"match_all":{}}; 
    }
 
-  console.log(JSON.stringify(search_query, null, 4));
 //     if("drange" in params ){
 //     const temp = decodeURIComponent(params["drange"])
 //     const reg_str = /([0-9]{4})\/([0-9]{2}) \- ([0-9]{4})\/([0-9]{2})/
