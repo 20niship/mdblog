@@ -29,16 +29,18 @@ router.get("/", async(req, res) => {
     case "sr": search_query["sort"] = { "lgtm_count": { "order": "asec" } };break;
   }
 
-   const default_search_query = {bool: {should:[]}, filter:[]};
+   const default_search_query = {bool: {should:[], filter:[]}};
    search_query["query"] =default_search_query; 
    if("q" in params) search_query.query.bool.should.push({"match":{"title" : params.q}});
-   if("c" in params) search_query.query.filter.push({"match":{"category" : params.c}});
-   if("ds" in params) search_query.query.filter.push({"range": {"create_time": {"gt": params.ds}}});
-   if("de" in params) search_query.query.filter.push({"range": {"create_time": {"lt": params.de}}});
+   if("c" in params) search_query.query.bool.filter.push({"match":{"tag" : params.c}});
+   if("ds" in params) search_query.query.bool.filter.push({"range": {"create_time": {"gt": params.ds}}});
+   if("de" in params) search_query.query.bool.filter.push({"range": {"create_time": {"lt": params.de}}});
 
-   if(search_query["query"] = default_search_query) { 
+   if(search_query.query.bool.should === [] && search_query.boolfilter === []) { 
      search_query["query"] ={"match_all":{}}; 
    }
+
+  console.log(JSON.stringify(search_query, null, 4));
 //     if("drange" in params ){
 //     const temp = decodeURIComponent(params["drange"])
 //     const reg_str = /([0-9]{4})\/([0-9]{2}) \- ([0-9]{4})\/([0-9]{2})/
@@ -53,7 +55,7 @@ router.get("/", async(req, res) => {
 
   const hits = await dbObj.custom_search(search_query);
   const hits_formatted = hits.map(e => { return {
-    title  : e._source?.TITLE || "",
+    title  : e._source?.title|| "",
     icon   : e._source?.icon || "",
 //    user   : e._source?.user,
     c_date : e._source?.create_time || "0000-00-00",
@@ -62,7 +64,7 @@ router.get("/", async(req, res) => {
     lgtm_count : e._source?.lgtm_count || 0,
     content_short :"hoge", 
     // content_short : e._source?.text_markdown.slice(10) || "no content",
-    category : e._source?.tag || []
+    tag : e._source?.tag || []
   }});
 
 

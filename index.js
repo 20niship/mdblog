@@ -94,6 +94,7 @@ app.use('/view', require("./routes/page"))
 
 app.use("/api", require("./routes/api"))
 app.use("/list", require("./routes/search"))
+app.use("/search", require("./routes/search"))
 /*
 app.use("/upload", require("./routes/upload"));
 app.all("/mypage",(req, res, next) => {

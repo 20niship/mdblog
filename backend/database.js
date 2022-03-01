@@ -79,7 +79,7 @@ class DBManager{
             lgtm_count : {type : "integer"},
             view_count : {type : "integer"},
             visible : {type : "boolean"},
-            thumb_url : {type : "text"},
+            icon : {type : "text"},
           }}})
       }
 
@@ -153,10 +153,17 @@ class DBManager{
     await this.client.deleteByQuery({ index: "accesslog", body: { query: { match_all: {} }}, ignore:[404]});
   }
 
+  async insert_page(body){
+    const res = await this.client.index({ index: 'mdblog_page', body})
+    console.log("hoge", res);
+    await this.client.indices.refresh({index: 'mdblog_page'})
+  }
+  
   async get_page_by_title(title){
       // const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "title": title } } }  })
-      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "TITLE": title } } }  })
-      if( res.hits.hits.length === 0) { return {}; }
+      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { match: { title: title } } }  })
+    console.log(res, title);
+      if( res.hits.hits.length === 0) { return null; }
       return res.hits?.hits[0];
   }
   
@@ -244,65 +251,6 @@ async getUsergroupID(usergroup_name){
   if(r.length === 0){return "";}
   return r[0]["usergroup_id"]
 }
-
-  // -----------------------　indexの作成、削除    -----------------------
-  async search(){
-      // ドキュメント内のレコードの数を数える
-      console.log("Counting.....");
-      // const res2 = await this.client.count({ index: 'mdblog_page' })
-      // console.log(res2)
-  
-      // -----------------------　検索    -----------------------
-  
-      const start = performance.now();
-      let res = {}
-      for(i = 0; i<500; i++){
-      res = await this.client.search({
-          index: 'mdblog_page',
-          body: {
-          size : 1,
-          query: {
-              "match": { "_id": 150 } 
-              // "match": { "CATEGORY": "Python" } 
-              // "match": { "text_markdown": "インストールしますであああ" } 
-          
-              // "multi_match" : {
-              // "query":    "Node.js",
-              // "fields": [ "title", "*_tag" ] 
-              // }
-          }
-          }
-      })
-      }
-      const end =  performance.now();
-      console.log(end-start);
-      console.log(res.hits.hits.length)
-      for (const blog of res.hits.hits) {
-      console.log('blog:', blog._id);
-      }
-      console.log("search2........")
-  /*
-      // 全データを取得するには、queryをmatch_allにする
-      // from, sizeで出力数を制限＆ページングできる
-      res = await this.client.search({ index: 'mdblog_page', body: { from:10, size:10, query: {match_all: {}} } })
-      for (const blog of res.hits.hits) {
-      console.log(`${blog._id}   ${blog._source.TITLE}`);
-      }
-  
-  
-      // Analyzer(kuromoji)が動いているかどうかのテスト
-      const res3 = await this.client.indices.analyze({
-      index: "page",
-      body: {
-          analyzer : "hoge_kuromoji_analyzer",
-          text : "インストールしま国会議事堂"
-      }
-      })
-      console.log("analyze result : ")
-      console.log(res3);
-  
-      */
-  }
 
 }
 let dbManager = new DBManager();

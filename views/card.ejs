@@ -13,8 +13,8 @@
 <div class="card-link">
 <a href="/search?d=<%- c_date %>" class="date"><i class="fas fa-clock icon"></i><%- c_date %></a>
 <a href="/search?d=<%- m_date %>" class="date"><i class="fas fa-code-branch"></i><%- m_date %></a>
-<% category.forEach((c) => { if (cat !== null) { %> 
-  <a href="/search?c=<%- cat %>" class="category"><%- c %></a>
+<% tag.forEach((c) => { if (c !== null) { %> 
+  <a href="/search?c=<%- c %>" class="category"><%- c %></a>
 <% } }) %>
 <div width="100%"></div>
 <a href="/view/<%- title %>">

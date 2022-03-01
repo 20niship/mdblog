@@ -19,7 +19,7 @@ router.get("/*", async(req, res) => {
     return;
   }
   const hits = await dbObj.get_page_by_title(title);
-  const found = hits.length !== {};
+  const found = hits !== null;
   // console.log(hits)
 
   if(req.query?.action === "edit" && found){
@@ -33,7 +33,7 @@ router.get("/*", async(req, res) => {
   has_edit_right = await dbObj.hasRight(page_id, "edit", req.session.username)
   */
   // const text_encoded = found ? md2html(hits?._source?.content) : ""
-  const text_encoded = found ? md2html(hits?._source?.text_markdown) : "";
+  const text_encoded = found ? md2html(hits?._source?.content) : "";
 
   const has_view_right = true;
   const has_edit_right = true;
