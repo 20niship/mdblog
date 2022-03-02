@@ -35,8 +35,6 @@ router.get("/register", (req, res) =>{
   res.render("login.ejs", data);
 })
 
-const bcrypt = require('bcrypt');
-
 router.use(express.urlencoded({ extended: true }))
 router.use(express.json());
 
@@ -51,8 +49,7 @@ router.post("/login", async(req, res) => {
   const verified = await dbObj.verify_user(username, password);
   console.log(verified)
 
-  if (verified){
-    logger.a_error("Database Error : " + err);
+  if (!verified){
     res.status(500).end();
     return;
   }

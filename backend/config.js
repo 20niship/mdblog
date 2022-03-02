@@ -7,7 +7,7 @@ let config = {
         port : 8000,
         expireTime : 0,
         defaultSearchReslut : 20,
-        icon : "/file/2.png"
+        icon : "/public/media/logo.jpg"
     },
 
     backend:{

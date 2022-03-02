@@ -300,16 +300,11 @@ function updatePreview(content){
 
 const save = async() => {
   console.log("saves all!")
-  const data = {
-    query     : "set",
-    page_title: title,
-    text      : cm.getValue(),
-  };
-  const result = await fetch("/api/page", {
+  const result = await fetch("/api/page/set", {
     method:"POST", headers: {'Content-Type': 'application/json'},
-    body:JSON.stringify(data)
+    body:JSON.stringify({title, content:cm.getValue() })
   })
-  if (result.ok) {MyMessage({msg:"上書き保存しました", duration:1500, type:"simple"})}
+  if (result.ok && result.status === 200) {MyMessage({msg:"上書き保存しました", duration:1500, type:"simple"})}
   else {MyMessage({msg:"保存できなかった！！", duration:1500, type:"simple"})}
   
   console.log("Done")
@@ -333,11 +328,11 @@ const setDefaultText = async() => {
 
     await setupWS();
 
-    response = await fetch("/api/page", {
+    response = await fetch("/api/page/get", {
       method:"POST", headers: {'Content-Type': 'application/json'},
-      body:JSON.stringify({query:`get`, page_title:title, format:"txt_markdown"})
+      body:JSON.stringify({title:title, format:"txt_markdown"})
     })
-    let text = await response.text();
+    let text = (await response.json())?.content;
     await cm.setValue(text, "");
 
     socket.emit("getall", JSON.stringify({token:token, title:title}))

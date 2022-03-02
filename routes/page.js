@@ -79,13 +79,14 @@ router.get("/*", async(req, res) => {
       description : config.general.description,
       title : config.general.title,
       logined : "username" in req?.session,
+      icon:config.general.icon,
       admin : true
     },
     page:{
       found,
       title : render_title_html(title),
       title_txt : title,
-      icon:"/file/logo.png",
+      icon:config.general.icon,
       content : text_encoded,
       username : hits?.user,
       category:[hits?._source?.tag] || [],

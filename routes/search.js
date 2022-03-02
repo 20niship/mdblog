@@ -52,16 +52,29 @@ router.get("/", async(req, res) => {
 //   }
 //   }
 
+  const formatDate = (dt) => {
+    try{
+      var y = dt.getFullYear();
+      var m = ('00' + (dt.getMonth()+1)).slice(-2);
+      var d = ('00' + dt.getDate()).slice(-2);
+      return (y + '-' + m + '-' + d);
+    }catch{
+      console.log("ERROR unkown datetime", dt)
+      // logger.a_error("Unknown datetime --> 0000-00-00")
+      return "0000-00-00"
+    }
+  }
+
   const hits = await dbObj.custom_search(search_query);
   const hits_formatted = hits.map(e => { return {
     title  : e._source?.title|| "",
     icon   : e._source?.icon || "",
 //    user   : e._source?.user,
-    c_date : e._source?.create_time || "0000-00-00",
-    m_date : e._source?.update_time || "0000-00-00",
+    c_date : formatDate(new Date(e._source?.create_time)),
+    m_date : formatDate(new Date(e._source?.update_time)),
     edit_count : e._source?.edit_count || 0,
     lgtm_count : e._source?.lgtm_count || 0,
-    content_short :"hoge", 
+    content_short :e._source?.content.slice(50), 
     // content_short : e._source?.text_markdown.slice(10) || "no content",
     tag : e._source?.tag || []
   }});
@@ -83,6 +96,7 @@ router.get("/", async(req, res) => {
       description : config.general.description,
       title : config.general.title,
       logined : true,
+      icon:config.general.icon,
       admin : true
     },
     render_goto_top:config.pages.render_goto_top,
