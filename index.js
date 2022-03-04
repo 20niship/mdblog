@@ -1,4 +1,5 @@
 const express = require("express");
+const dbObj = require("./backend/database");
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
@@ -33,31 +34,15 @@ if (process.env.NODE_ENV !== 'production') {
 app.set("view engine", "ejs");
 app.use("/user", require("./routes/user"))
 app.use((req, res, next) => {
-  // const sql = "SELECT username FROM sessions WHERE session_id = ? limit 1";
-  // con.query(sql, [ req.session.id], (err, results, fields) => {
-  //   if(err){
-  //   }else if(results.length === 0){
-  //     res.redirect("/user/login")
-  //   }else{
-  //     let username=
-  //   }
-  // }
   if("username" in req.session){
     next();
   }else if(config.user.EnableAuthentication){
       res.redirect('/user/login');
   }else{
-    req.session.username = "<guest>"
+    // req.session.username = "<guest>"
     next();
   }
 })
-
-// Logger
-if (process.env.NODE_ENV !== 'production') {
-  app.use((req, res, next) => {
-    next();
-  })
-}
 
 // file cache
 if(config.general.expireTime > 0){
@@ -85,6 +70,39 @@ app.all("/mypage",(req, res, next) => {
 });
 
 app.use("/admin", require("./routes/admin"));
+
+app.all("/latest", async(req, res) => {
+  const hits = await dbObj.custom_search_q({s:"d"});
+  const data = {
+    head : {
+      title:config.general.title,
+      description:config.general.description,
+      keywords: "hogehoge",
+      author : "author",
+      og_title :  "検索結果 -- " + config.general.title,
+      og_url: config.general.url,
+      og_image : config.general.icon,
+      og_site_name : config.general.title,
+      title :   "検索結果 -- " + config.general.title
+    },
+    header : {
+      description : config.general.description,
+      title : config.general.title,
+      logined : true,
+      icon:config.general.icon,
+      admin : true
+    },
+    render_goto_top:config.pages.render_goto_top,
+    render_lgtm_btn:config.pages.render_lgtm_btn,
+    hits,
+    nfound : hits.length,
+    nresult : hits.length,
+    query:req.params
+  };
+  
+  res.render("list.ejs", data);
+})
+
 
 app.all("/", (req, res) => {
   res.writeHead(302, { 'Location': config.pages.mainPage});
@@ -117,7 +135,6 @@ io.on('connection', (socket) => {
   const isConnected = (soc)=> {
     return soc && soc.connected //readyState === WebSocket.OPEN
   }
-
 
   // Deprecated
   socket.on("verify", (m) => {

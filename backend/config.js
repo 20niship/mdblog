@@ -1,13 +1,14 @@
 
 let config = {
     general : {
-        title : "RoboTech",
-        description : "Sample MDwiki description",
-        url : "localhost",
-        port : 8000,
-        expireTime : 0,
-        defaultSearchReslut : 20,
-        icon : "/public/media/logo.jpg"
+      title : "RoboTech",
+      description : "Sample MDwiki description",
+      url : "localhost",
+      port : 8000,
+      expireTime : 0,
+      defaultSearchReslut : 20,
+      icon : "/public/media/logo.jpg",
+      url_type : "id"  // [id, title]
     },
 
     backend:{
@@ -28,7 +29,7 @@ let config = {
         AllowEditWithoutLogin :   false,
         AllowDeleteWithoutLogin : false,
         UseTwoStepVerification : false,
-        EnableAuthentication   : true,
+        EnableAuthentication   : false,
         MaxUserNumber : 10000,
     },
     

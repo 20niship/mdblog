@@ -15,7 +15,8 @@ var onCmUpdate = null;
 var cm;
 
 let decoded_url = document.location.pathname.replace("/view/", "").replace(/(.^\/)*\/+$/gm, "$1");
-let title = decodeURI(decoded_url)
+const url = decodeURI(decoded_url);
+let title = "";
 
 function setVisualMode(){
   switch(document.querySelector('input[name="view"]:checked').value){
@@ -302,7 +303,7 @@ const save = async() => {
   console.log("saves all!")
   const result = await fetch("/api/page/set", {
     method:"POST", headers: {'Content-Type': 'application/json'},
-    body:JSON.stringify({title, content:cm.getValue() })
+    body:JSON.stringify({url, title, content:cm.getValue() })
   })
   if (result.ok && result.status === 200) {MyMessage({msg:"上書き保存しました", duration:1500, type:"simple"})}
   else {MyMessage({msg:"保存できなかった！！", duration:1500, type:"simple"})}
@@ -325,16 +326,15 @@ const setDefaultText = async() => {
   try {
     let response = await fetch("/ws-ticket", {method:"POST"});
     token = await response.text();
-
     await setupWS();
 
     response = await fetch("/api/page/get", {
       method:"POST", headers: {'Content-Type': 'application/json'},
-      body:JSON.stringify({title:title, format:"txt_markdown"})
+      body:JSON.stringify({url, format:"txt_markdown"})
     })
-    let text = (await response.json())?.content;
-    await cm.setValue(text, "");
-
+    const js = await response.json();
+    title = js.title;
+    await cm.setValue(js.content, "");
     socket.emit("getall", JSON.stringify({token:token, title:title}))
   } catch (e) {
     console.log("Unable to get token : ", e)

@@ -116,6 +116,7 @@ form input[type="submit"] {
     <input id="register" type="radio" name="tab_item">
     <label class="tab_item" for="register">Register</label>
 
+    <p style="color:#f00;"><%- msg %></p>
     <div class="tab_content" id="login_content">
       <form action="/user/login" method="POST">
         <input type="text" name="username" placeholder="Username" required>

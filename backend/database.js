@@ -3,7 +3,6 @@ const elasticsearch = require('elasticsearch');
 const logger =  require("./logger");
 const config = require("./config");
 const bcrypt = require("bcrypt");
-const { param } = require('../routes/user');
 
 class DBManager{
   constructor(){
@@ -81,6 +80,7 @@ class DBManager{
             lgtm_count : {type : "integer"},
             view_count : {type : "integer"},
             visible : {type : "boolean"},
+            url : {type : "keyword"},
             icon : {type : "text"},
           }}})
       }
@@ -156,24 +156,55 @@ class DBManager{
   }
 
   async insert_page(body){
-    const res = await this.client.index({ index: 'mdblog_page', body})
-    console.log("hoge", res);
+    let body2 = body;
+    if(config.general.url_type === "id"){ body2["url"] = Date.now(); }
+    else {
+      // titleの文字列をURLに指定する。?, &, <space> が入っているときは取り除く
+      const url = (body?.title || "").replace("?", "").replace("&", "").replace(" ", "");
+      if(url !== body?.title){ console.log("タイトルに不正な文字列が含まれています"); return false; }
+      body2["url"] = url;
+    }
+    const res = await this.client.index({ index: 'mdblog_page', body:body2})
+    await this._reflesh_page();
+    return res;
+  }
+
+  async _reflesh_page(){
     await this.client.indices.refresh({index: 'mdblog_page'})
   }
-  
-  async update_page_content_by_title(title, content){
+
+  async get_page_by_url(url){
+    const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { term: {url}}}, ignore:[404, 400] })
+    if(res?.hits?.hits?.length > 0) { return res?.hits?.hits[0]; }
+    return null; 
+  }
+ 
+  async update_page_content_by_url(url, content){
     const res = await this.client.updateByQuery({index:"mdblog_page", body:{
-      query:{match:{title}},
+      query:{term:{url}},
       script:{inline:`ctx._source.content = \"${content.replaceAll("\"", "\\\"").replaceAll("\\", "\\\\")}\"` }
     }})
     return res;
   }
+  
+  async update_page_title_by_url(url, title){
+    const res = await this.client.updateByQuery({index:"mdblog_page", body:{
+      query:{term:{url}},
+      script:{inline:`ctx._source.title = \"${title.replaceAll("\"", "\\\"").replaceAll("\\", "\\\\")}\"` }
+    }})
+    return res;
+  }
+  
+  async delete_page_by_url(url){
+    const res = await this.client.delete({index:"mdblog_page", body:{query:{term:{url}}}})
+    return res;
+  }
+
+
   async get_page_by_title(title){
-      // const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "title": title } } }  })
-      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { match: { title: title } } }  })
-    console.log(res, title);
-      if( res.hits.hits.length === 0) { return null; }
-      return res.hits?.hits[0];
+      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { match: { title } } }  })
+    if(res?.hits?.hits?.length > 0) { return res?.hits?.hits[0]; }
+    return null; 
   }
   
   async get_page_by_id(id){
@@ -186,10 +217,85 @@ class DBManager{
     return res.hits?.hits;
   }
 
-  async get_page_by_id(pageid){
-      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "_id": pageid } } }  })
-      return res.hits?.hits;
+  // 検索に使われるパラメータ
+  // q : 検索用語
+  // p : page 1からスタート
+  // n : 表示数
+  // c : カテゴリー
+  // ds : 投稿日のスタート（date start）
+  // de : 投稿日のエンド(date end)
+
+  // s : sort (0:デフォルト（検索語区順位）、d:日程, v:Visited, s:Stard, ) dr, vr, sr (reverse)がついたときには逆順
+async custom_search_q(params){
+  for(let i in params){ if(params.i === ""){ delete params.i; } }
+  let search_query= {};
+  const default_hit_size = 20;
+  const max_hit_size = 50;
+  search_query["size"] = Math.min(max_hit_size, params?.n || default_hit_size)
+  search_query["from"] = (params?.page || 0) * search_query["size"];
+  switch(params?.s){
+    case "0": break;
+    case "d":  search_query["sort"] = { "create_time": { "order": "desc" } }; break;
+    case "dr": search_query["sort"] = { "create_time": { "order": "asec" } };break;
+    case "v":  search_query["sort"] = { "view_count": { "order": "desc" } };break;
+    case "vr": search_query["sort"] = { "view_count": { "order": "asec" } };break;
+    case "s":  search_query["sort"] = { "lgtm_count": { "order": "desc" } };break;
+    case "sr": search_query["sort"] = { "lgtm_count": { "order": "asec" } };break;
   }
+
+   const default_search_query = {bool: {should:[], filter:[]}};
+   search_query["query"] =default_search_query; 
+   if("q" in params) search_query.query.bool.should.push({"match":{"title" : params.q}});
+   if("c" in params) search_query.query.bool.filter.push({"match":{"tag" : params.c}});
+   if("ds" in params) search_query.query.bool.filter.push({"range": {"create_time": {"gt": params.ds}}});
+   if("de" in params) search_query.query.bool.filter.push({"range": {"create_time": {"lt": params.de}}});
+
+   if(search_query.query.bool.should === [] && search_query.boolfilter === []) { 
+     search_query["query"] ={"match_all":{}}; 
+   }
+
+
+  console.log("----------------------")
+  console.log(search_query);
+
+  const hits = await this.custom_search(search_query);
+  const formatDate = (dt) => {
+    try{
+      var y = dt.getFullYear();
+      var m = ('00' + (dt.getMonth()+1)).slice(-2);
+      var d = ('00' + dt.getDate()).slice(-2);
+      return (y + '-' + m + '-' + d);
+    }catch{
+      console.log("ERROR unkown datetime", dt)
+      // logger.a_error("Unknown datetime --> 0000-00-00")
+      return "0000-00-00"
+    }
+  }
+
+  return hits.map(e => { return {
+    title  : e._source?.title|| "",
+    url  : e._source?.url || "",
+    icon   : e._source?.icon || "",
+//    user   : e._source?.user,
+    c_date : formatDate(new Date(e._source?.create_time)),
+    m_date : formatDate(new Date(e._source?.update_time)),
+    edit_count : e._source?.edit_count || 0,
+    lgtm_count : e._source?.lgtm_count || 0,
+    content_short :e._source?.content.slice(50), 
+    // content_short : e._source?.text_markdown.slice(10) || "no content",
+    tag : e._source?.tag || []
+  }});
+}
+async get_categories(pageid){
+  const res = await this.client.search({index: "mdblog_page", body:{
+    aggs: { category_count: { terms: { field : "tag.keyword", size: 500 }}}, size : 0 }});
+  return res?.aggregations?.category_count?.buckets;
+}
+
+async get_page_by_id(pageid){
+  const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "_id": pageid}}}})
+  return res.hits?.hits;
+}
 
   async get_page_by_timestamp(timestamp){
       const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "timestamp": timestamp } } }  })
@@ -226,22 +332,24 @@ class DBManager{
       return true;
   }
 
-  async register_user(username, password){
-    const hash = await bcrypt.hash(password, config.backend.salt);
-    console.log(hash, password);
+  async register_user(username, password, is_admin=false){
+    const exist_users = await this.get_user_by_username(username);
+    if(exist_users){
+       console.log(`User ${username} already exists`);
+       return false;
+    }
 
+    const hash = await bcrypt.hash(password, config.backend.salt);
     if(! new RegExp(/^([a-zA-Z0-9]{4,100})$/).test(username)){
       console.log("invalid username  : " , username);
       return false;
     }
-
-    const res = await this.client.index({index:"session_store", body:{username, password:hash }});
-    
+    const res = await this.client.index({index:"mdblog_user", body:{username, password:hash, register_time: Date.now(), is_admin, edit_count:0 }});
     return res;
   }
 
   async verify_user(username, password){
-    const res = await this.client.search({index : "session_store", body:{query:{match:{username}}}})
+    const res = await this.client.search({index : "mdblog_user", body:{query:{match:{username}}}})
     if(! res?.hits?.hits){ return false; }
     if(res?.hits?.hits.length === 0) { return false; }
     const u = res.hits.hits[0]?._source;
@@ -249,13 +357,10 @@ class DBManager{
     return cmp;
   }
 
-  async get_user_by_username(user_name){
-    const sql_query = "SELECT * FROM users WHERE user_name=?";
-    const [results, fields, err] = await this.connection.query(sql_query, [user_name]);
-    if (err){
-      logger.a_error("Database Error : " + err);
-    }
-    return results[0];
+  async get_user_by_username(username){
+    const res = await this.client.search({index : "mdblog_user", body:{query:{match:{username}}}})
+    if(!res?.hits?.hits){return {}; }
+    return res?.hits?.hits[0];
   }
 
 async getPageID(page_title){

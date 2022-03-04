@@ -149,26 +149,20 @@ setDefaultSidebar();
 
 
 const create_new_page = async(baseDir, type) => {
-  let new_title = baseDir + document.getElementById(`f_page_title_${type}`).value;
-  console.log(new_title);
+  const title = baseDir + document.getElementById(`f_page_title_${type}`).value;
   const err_el = document.getElementById("create-new-page-err-msg");
-  const response = await fetch("/api/page", {
+  const response = await fetch("/api/page/create", {
     method:"POST", headers: {'Content-Type': 'application/json'},
-    body:JSON.stringify({query:`create`, page_title:new_title, format:"markdown"})
+    body:JSON.stringify({title})
   })
-
   if(response.status === 403){
-    err_el.innerText = `[ ERROR ] 記事　${new_title}　は既に存在します`
+    err_el.innerText = `[ ERROR ] 記事　${title}　は既に存在します`
   }else if(!(response.ok)){
     err_el.innerText = "[ ERROR ] サーバーと接続できません。"
-    return;
   }else{
     MyMessage({msg:"記事を作成しました"})
-    const new_title2 = (await response.json())["page_title"]
-    if(new_title !== new_title2){
-      await MyMessage({type:"confirm", title:"Notice", msg:"いくつかの特殊文字をエスケープしました"})
-    }
-    document.location.href = "/view/" + new_title2 + "?action=edit"
+    const js = await response.json();
+    document.location.href = "/view/" + js.url + "?action=edit"
   }
 }
 

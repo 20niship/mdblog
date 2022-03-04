@@ -1,8 +1,9 @@
 const config = require("./backend/config");
-var dbObj = require("./backend/database");
+const dbObj = require("./backend/database");
 const bcrypt = require('bcrypt');
 const readline = require('readline');
 const fs = require("fs");
+const { userInfo } = require("os");
 
 if(process.argv.length < 3){
   console.log("Please input at least one arg")
@@ -43,13 +44,23 @@ const create_user = async()=> {
   const email    = await getInput("email    : ");
   const admin    = await getInput("admin(y/n) : ") === "y";
 
-  const hash = bcrypt.hashSync(password, config.backend.salt);
-  console.log(username, password, email, admin)
-
+  console.log("create user (username, password, email, admin)", username, password, email, admin)
+  const exist_user = await dbObj.get_user_by_username(username);
+  if(exist_user !== {}){
+    console.log("User already exists! "); return;
+  }
   if(! new RegExp(/^([a-zA-Z0-9]{4,100})$/).test(username)){
     console.error("usernameが半角英数字ではありません")
     return;
   }
+  const res = dbObj.create_user(username, password, admin);
+
+  if(res){
+    console.log("ユーザーの作成が成功しました")
+  }else{
+    console.log("ユーザーの作成に失敗しました")
+  }
+
     // TOOO: 同名のユーザーが存在するかちぇっく
     // TODO: insert user
 }
@@ -74,7 +85,7 @@ const healthcheck = async() => {
 }
 
 const json_restore = async() => {
-  const fname = await getInput("json file name --> ");
+  const fname = process.argv[3] || await getInput("json file name --> ");
   const data = fs.readFileSync(fname);
   const json_data = JSON.parse(data);
   if(!dbObj.connected){
@@ -83,8 +94,7 @@ const json_restore = async() => {
   }
   if("page" in json_data){
      console.log(`${json_data.page.length} page found! inserting to database ........`);
-     for(i = 0; i<json_data.page.length; i++){
-       const e = json_data.page[i];
+     for(const e of json_data.page){
        console.log("title = ", e?.title);
        await dbObj.insert_page(e);
      }

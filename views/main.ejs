@@ -83,7 +83,23 @@
     <% if (page.has_edit_right && page.found) { %>
     <input type="button" value="edit" onclick="window.location = window.location.pathname + '?action=edit';" class="text-button" />
     <% } %>
-    <input type="button" value="new" onclick="{document.getelementbyid('popup-new-page').style.display = 'block';}" class="text-button" />
+    <input type="button" value="new" onclick="{document.getElementById('popup-new-page').style.display = 'block';}" class="text-button" />
+    <input type="button" value="delete" onclick="delete_this_page()" class="text-button" />
+    <script>
+      const delete_this_page = async() => {
+        const decoded_url = document.location.pathname.replace("/view/", "").replace(/(.^\/)*\/+$/gm, "$1");
+        const url = decodeURI(decoded_url);
+        const result =  await fetch("/api/page/delete", {
+          method:"post", headers: {'content-type': 'application/json'},
+          body:JSON.stringify({url})
+        })
+        if(result.ok){
+          mymessage({msg:"グループ設定を変更しました", type:"simple"})
+        }else{
+        mymessage({msg:"グループ設定を変更しました", type:"simple"})
+        }
+      }
+    </script>
   </div>
   
   <div id="maintext">
@@ -99,7 +115,7 @@
 
   <div class="popup new-page" id="popup-new-page" style="display: none;">
     <div class="popup-inner my-form">
-      <button class="popup-close-btn" onclick="{document.getelementbyid('popup-new-page').style.display = 'none';}"><i class="fas fa-times"></i></button>
+      <button class="popup-close-btn" onclick="{document.getElementById('popup-new-page').style.display = 'none';}"><i class="fas fa-times"></i></button>
       <p class="my-form-title">新しいページを作成</p>
       <table>
         <tr style="background:none;"><td><spqn>自分のページ内で作成</spqn></td><td></td></tr>

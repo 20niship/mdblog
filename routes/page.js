@@ -11,19 +11,16 @@ router.get("/", (req, res) => {
 
 router.get("/*", async(req, res) => {
   const title = decodeURI(req.url).split("?")[0].slice(1).replace(/(.^\/)*\/+$/gm, "$1")
-  console.log("TiTLE=", title);
 
   if(!dbObj.is_connected()) {
     res.render("error", {code:500, msg:"Internal Server Error"})
     console.log("Not connected to database!!")
     return;
   }
-  const hits = await dbObj.get_page_by_title(title);
-  const found = hits !== null;
-  // console.log(hits)
+  const hits = await dbObj.get_page_by_url(title);
+  const found = Boolean(hits);
 
   if(req.query?.action === "edit" && found){
-  console.log("bb")  
     res.render("editor", { config,  page : { hits,  title }});
     return;
   }
@@ -35,13 +32,15 @@ router.get("/*", async(req, res) => {
   */
   // const text_encoded = found ? md2html(hits?._source?.content) : ""
   const text_encoded = found ? md2html(hits?._source?.content) : "";
-
   const has_view_right = true;
   const has_edit_right = true;
   
-  const render_title_html = (_title) => {
+  const render_title_html = (source) => {
+    if(config.general.url_type === "id"){
+       return `<a href="/"><i class="fas fa-home"></i>/</a><a href="${source?.url}">${source?.title}</a>`
+    }
     let title_html = `<a href="/"><i class="fas fa-home"></i>/</a>`;
-    let t_s = _title.split("/")
+    let t_s = source?.title.split("/")
     let t_d = "/view/"
     t_s.forEach(tt => {
       title_html += `<a href=\"${t_d + tt}\">${tt}</a>/`;
@@ -84,7 +83,7 @@ router.get("/*", async(req, res) => {
     },
     page:{
       found,
-      title : render_title_html(title),
+      title : render_title_html(hits?._source),
       title_txt : title,
       icon:config.general.icon,
       content : text_encoded,
