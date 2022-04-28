@@ -292,14 +292,17 @@ async get_categories(pageid){
   return res?.aggregations?.category_count?.buckets;
 }
 
-async get_page_by_id(pageid){
-  const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "_id": pageid}}}})
-  return res.hits?.hits;
-}
 
-  async get_page_by_timestamp(timestamp){
-      const res = await this.client.search({ index: 'mdblog_page',  body: { size : 1, query: { "match": { "timestamp": timestamp } } }  })
-      return res.hits?.hits;
+  async page_all(){
+   const res = await this.client.search({index:"mdblog_page", body:{size:1000, query:{match_all:{}}}});
+    return res?.hits?.hits || null;
+  }
+
+/*  ---------------------     [ SECTION ]  user configs  -------------------------    */
+
+  async get_users(){
+    const res = await this.client.search({index:"mdblog_user", body:{query:{match_all:{}}}});
+    return res?.hits?.hits || null;
   }
 
   async is_admin_by_username(username){

@@ -1,4 +1,4 @@
-
+<!DOCTYPE HTML>
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
@@ -6,25 +6,8 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
   </head>
   <body>
-    <header class="site-header">
-      <div class="header_wrapper">
-        <div class="header_start">
-          <img src="/file/logo.png" width=50 class="h_logo"/>
-          <a href="/" class="h_title"><%- title %></a>
-          <span class="h_desc"><%- description %></span>
-        </div>
-  
-        <div class="header_end">
-          <div class="h_search">
-            <form action = "/search" class="search-form" method = “get”>
-              <input type="text" class="searchTerm" name="q" placeholder="What are you looking for?">
-              <input type="submit" class="searchButton" value="&#xf002">
-            </form>
-          </div>
-        </div>
-      </div>
-    </header>
-    <main style="margin-top: 70px;">
+  <% include("header.ejs", header) %>
+  <main style="margin-top: 70px;">
       <div class="chart-container">
         <div class="chart-wrapper chart-cpu-speed"><h1>CPU 周波数[GHz]</h1><canvas id="chart-cpu-speed" ></canvas></div>
         <div class="chart-wrapper chart-cpu-temp"><h1>CPU 温度[℃]</h1><canvas id="chart-cpu-temp" ></canvas></div>

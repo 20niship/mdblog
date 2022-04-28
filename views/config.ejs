@@ -384,10 +384,11 @@
       <tbody id="datatable" class="list">
         <% group.users.forEach((user) => { %>
           <tr>
-            <td class="td_userid"><%- user.user_id %></td>
-            <td class="td_name"><%- user.user_name %></td>
-            <td class="td_icon"><%- user.user_icon %></td>
-            <td class="td_admin"><%- user.user_admin %></td>
+            <td class="td_userid"><%- user._id%></td>
+            <td class="td_userid"><%- user._source.user_id %></td>
+            <td class="td_name"><%- user._source.username %></td>
+            <td class="td_icon"><%- user._source.user_icon %></td>
+            <td class="td_admin"><%- user._source.user_admin %></td>
             <td><button onclick="delete_user_from_group( <%- user.user_id %>, <%- group.usergroup_id %> )">削除</button></td>
           </tr>
         <% }) %>
@@ -552,7 +553,36 @@
 
     <% } else if (page === 'page') { %>
     <h1>Page settings</h1>
-    <h2>工事中、、、</h2>
+    <table id="page_list">
+      <thead>
+        <tr>
+          <td class="sort" data-sort="td_url">url</td>
+          <td class="sort" data-sort="td_title">title</td>
+          <td class="sort" data-sort="td_username">username</td>
+          <td class="sort" data-sort="td_c_time">created at</td>
+          <td class="sort" data-sort="td_u_time">last update</td>
+          <td class="sort" data-sort="td_tag">tag</td>
+          <td class="sort" data-sort="td_content">content</td>
+          <td >削除</td>
+          <td >Rename</td>
+        </tr>
+      </thead>
+      <tbody id="datatable" class="list">
+        <% pages.forEach((p) => { %>
+          <tr>
+            <td class="td_url"><a href="/view/<%- p._source.url %>"</a><%- p._source.url %></td>
+            <td class="td_title"><a href="/view/<%- p._source.url %>"><%-p._source.title%></a></td>
+            <td class="td_title"><%-p._source.username %></td>
+            <td class="td_c_time"><%- new Date(p._source.create_time)%></td>
+            <td class="td_u_time"><%- new Date(p._source.update_time)%></td>
+            <td class="td_tag"><%-p._source.tag %></td>
+            <td class="td_u_time"><%-p._source.content_short %></td>
+            <td><button onclick="delete_page( <%- p._source.url %>)">削除</button></td>
+            <td><button onclick="rename_page( <%- p._source.url %>)">削除</button></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
   <% } else { %>
     <h1>505 - Internal Server Error</h1>    
   <% } %>

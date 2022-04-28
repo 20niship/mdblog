@@ -35,18 +35,8 @@ router.post("/page/set", async(req, res)=> {
 })
 
 router.post("/page/search", async(req, res)=> {
-  const title = req?.body?.title;
-  const content = req?.body?.content;
-  const result = await dbObj.update_page_content_by_title(title, content);
-  if(result?.failures.length === 0){
-    res.send("ok");
-  }else{
-    res.status(500).send("error")
-  }
-})
-
-router.post("/page/list", async(req, res) => {
-  const result = await dbObj.custom_search_q(req.body);
+  const result = await dbObj.custom_search_q(req?.body);
+  res.status(result.length === 0 ? 404 : 200);
   res.json(result);
 })
 

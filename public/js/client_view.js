@@ -29,8 +29,6 @@ let status={
   text:""
 }
 
-console.log(status)
-
 const loadText = async() => {
   let toc = document.getElementById("toc");
   let main_wrapper = document.getElementById("post-content");
@@ -88,12 +86,12 @@ const side_myedit = document.getElementById('sidenav_myedit');
 
 // Deafult
 setDefaultSidebar = async(e) => {
-  const response = await fetch("/api/page", {
+  const response = await fetch("/api/page/get", {
     method:"POST", headers: {'Content-Type': 'application/json'},
-    body:JSON.stringify({query:`get`, page_title:"sidebar", format:"txt_html"})
+    body:JSON.stringify({title:"sidebar"})
   })
   if(response.ok){
-    let text = await response.text()
+    let text = (await response.json())?.content || "";
     text = RenderEmbed(text)
     side_content.innerHTML = "<h1>Custom Sidebar</h1>" + text;
   }else if(response.status === 404){
@@ -111,7 +109,11 @@ if(isSmartPhone()){
   side_myedit.onclick = (e)=>{ alert("501 - Not Implemented Error") }
 }else{
   side_history.onclick = async(e)=>{
-    const response = await fetch("/api/pagesearch?sort=update_r&format=tile");
+    const response = await fetch("/api/page/latest", {  
+      method:"POST", headers: {'Content-Type': 'application/json'},
+      body:""
+    });
+
     if(response.ok){
       side_content.innerHTML = "<h1>Recently Edited</h1>" + await response.text();
     }
@@ -128,7 +130,7 @@ if(isSmartPhone()){
   }
   
   side_star.onclick = async(e)=>{
-    const response = await fetch("/api/pagesearch?favorite=true&format=tile");
+    const response = await fetch("/api/page/search?favorite=true&format=tile");
     if(response.ok){
       side_content.innerHTML = "<h1>Your Favorites</h1>" + await response.text();
     }

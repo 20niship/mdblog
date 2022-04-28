@@ -74,28 +74,28 @@ const setRightsState = async(type, groupid) => {
   if(groupid>0){
     const enabled = document.getElementById(`toggle-${type}-group` + groupid).checked;
     const result =  await fetch("/api/page", {
-              method:"POST", headers: {'Content-Type': 'application/json'},
-              body:JSON.stringify({query:`set${type}right`, usergroup_id:groupid, state:enabled,page_title:title})
+              method:"post", headers: {'content-type': 'application/json'},
+              body:json.stringify({query:`set${type}right`, usergroup_id:groupid, state:enabled,page_title:title})
             })
     if(result.ok){
-      MyMessage({msg:"グループ設定を変更しました", type:"simple"})
+      mymessage({msg:"グループ設定を変更しました", type:"simple"})
     }else{
-      MyMessage({msg:"グループ設定を変更しました", type:"simple"})
+      mymessage({msg:"グループ設定を変更しました", type:"simple"})
     }
   }else{
-    const enabled_admin = document.getElementById(`admin-rights-checkbox`).checked;
-    const enabled_all = document.getElementById(`all-rights-checkbox`).checked;
+    const enabled_admin = document.getelementbyid(`admin-rights-checkbox`).checked;
+    const enabled_all = document.getelementbyid(`all-rights-checkbox`).checked;
     const result =  await fetch("/api/page", {
-        method:"POST", headers: {'Content-Type': 'application/json'},
-        body:JSON.stringify({query:`set${type}right`, allow_admin:enabled_admin, allow_all:enabled_all, page_title:title})
+        method:"post", headers: {'content-type': 'application/json'},
+        body:json.stringify({query:`set${type}right`, allow_admin:enabled_admin, allow_all:enabled_all, page_title:title})
       })
     if(result.ok){
-      MyMessage({msg:"設定を変更しました"})
+      mymessage({msg:"設定を変更しました"})
     }else{
-      MyMessage({msg:"設定変更に失敗しました", type:"simple"})
+      mymessage({msg:"設定変更に失敗しました", type:"simple"})
     }
   }
-  setSideView(type);
+  setsideview(type);
 }
 
 const setCategory = async(c) => {
@@ -152,7 +152,7 @@ const pageRemove = async() => {
     body:JSON.stringify({ query:`remove`, page_title:title})
   })
   if(response.ok){
-    socket.emit("force-finish", JSON.stringify({token:token, title:title}));
+    // socket.emit("force-finish", JSON.stringify({token:token, title:title}));
     await MyMessage({title:"削除完了", msg:`このページは既に正常に削除されました`, type:"confirm"})
     document.location.href = "/";
   }else{
@@ -292,7 +292,7 @@ id="toggle-${type}-group${groups[g].usergroup_id}" onclick="setRightsState('${ty
   }
 }
 
-function updatePreview(content){
+const updatePreview = () => {
     let md = cm.getValue();
     preview.contentWindow.document.open();
     preview.contentWindow.document.write(md2html(md, render_component=false));
@@ -324,9 +324,9 @@ let loader = document.getElementById("loader-wrapper");
 
 const setDefaultText = async() => {
   try {
-    let response = await fetch("/ws-ticket", {method:"POST"});
-    token = await response.text();
-    await setupWS();
+    // let response = await fetch("/ws-ticket", {method:"POST"});
+    // token = await response.text();
+    // await setupWS();
 
     response = await fetch("/api/page/get", {
       method:"POST", headers: {'Content-Type': 'application/json'},
@@ -335,7 +335,8 @@ const setDefaultText = async() => {
     const js = await response.json();
     title = js.title;
     await cm.setValue(js.content, "");
-    socket.emit("getall", JSON.stringify({token:token, title:title}))
+    // socket.emit("getall", JSON.stringify({token:token, title:title}))
+   loader.style.display = "none";
   } catch (e) {
     console.log("Unable to get token : ", e)
   }
@@ -346,19 +347,11 @@ const setupWS = async() => {
     console.log("Connecting to server .......");
 
     socket.on('connect', function () {
-      const isNullJSON = function(obj) {
-        return obj && obj.constructor === Object
-      }
-
-      socket.emit("verify", JSON.stringify({token:token, title:title}));
-
+      // socket.emit("verify", JSON.stringify({token:token, title:title}));
       console.log("token = ", token)
-      
       socket.on('text-change', (msg)=> {
         console.log(msg)
         var jmsg = JSON.parse(msg);
-        let val = document.getElementById('EditorTextArea');
-
         console.log("remote change!");
         let from    = jmsg.message.from;
         let to      = jmsg.message.to;
@@ -382,7 +375,7 @@ const setupWS = async() => {
       });
 
       socket.on("getall", function(msg){
-        socket.emit("setall", JSON.stringify({token:token, message:cm.getValue(), title:title}));
+        // socket.emit("setall", JSON.stringify({token:token, message:cm.getValue(), title:title}));
       })
 
       socket.on("setall", (msg)=> {
@@ -482,7 +475,7 @@ window.onload = () => {
     updatePreview();
     console.log("get update", e, e.origin)
     if(e.origin !== "@ignore" && e.origin !== "setValue"){
-      socket.emit("text-change", JSON.stringify({token:token, message:e, title:title}));
+      // socket.emit("text-change", JSON.stringify({token:token, message:e, title:title}));
     }
   });
 

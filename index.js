@@ -5,6 +5,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const crypto = require('crypto');
 const WebSocket = require('ws');
+const morgan = require('morgan')
 
 const config = require("./backend/config");
 
@@ -29,6 +30,8 @@ app.use(session({
 if (process.env.NODE_ENV !== 'production') {
   app.disable('etag')
 }
+
+app.use(morgan("dev"))
 
 // テンプレートエンジンの指定
 app.set("view engine", "ejs");
