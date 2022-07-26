@@ -1,5 +1,5 @@
 
-let config = {
+const config = {
     general : {
       title : "RoboTech",
       description : "Sample MDwiki description",
@@ -65,5 +65,4 @@ let config = {
     }
 }
 
-module.exports = config;
-
+export default config;
