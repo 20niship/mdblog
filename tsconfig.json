@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+   "target": "ES2019",
+   "module": "commonjs",
+    // "module": "ESNext",
+   "sourceMap": true,
+   "strict": true,
+   "esModuleInterop": true,
+   "skipLibCheck": true,
+   "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "lib": [
+      "ESNext",
+      "ESNext.AsyncIterable",
+      "DOM"
+    ],
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [ "./*"],
+      "@/*": [ "./*"]
+    },
+    "types": [
+      "@types/node",
+      "@nuxt/types",
+      "@nuxtjs/auth-next"
+    ]
+ },
+ "include": [
+   "api/*",
+   "components/*",
+   "pages/*",
+   "utils/*"
+ ],
+  "exclude": [
+    "node_modules"
+  ],
+  // https://v3.nuxtjs.org/concepts/typescript
+  "extends": "./.nuxt/tsconfig.json"
+}

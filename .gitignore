@@ -132,3 +132,13 @@ dist
 package-lock.json
 ./public/media/*
 !./public/media/.gitkeep
+
+.nuxt/*
+.output/*
+yarn-error.json 
+yarn.lock
+
+
+
+
+

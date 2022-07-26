@@ -1,26 +1,20 @@
 {
-  "name": "mdblog",
-  "version": "1.0.0",
-  "description": "## features",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "nodemon index.js",
-    "start": "node index.js"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "start": "nuxt start",
+    "clean": "rimraf build/*",
+    "analyze": "nuxt build --analyze"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@elastic/elasticsearch": "^8.0.0",
-    "bcrypt": "^5.0.1",
-    "connect-busboy": "^1.0.0",
-    "ejs": "^3.1.6",
-    "elasticsearch": "^16.7.2",
-    "express": "^4.17.2",
-    "express-elasticsearch-session": "^0.2.0",
-    "express-session": "^1.17.2",
-    "fs-extra": "^10.0.1",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.4",
-    "socket.io": "^4.4.1"
+  "devDependencies": {
+    "nuxt": "3.0.0-rc.6",
+    "@nuxtjs/axios" : "latest",
+    "express": "latest",
+    "@types/express" : "latest",
+    "@elastic/elasticsearch": "latest",
+    "mongodb": "latest"
   }
 }
