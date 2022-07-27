@@ -7,22 +7,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" >
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css" >
 
-<div class="editor-menu">
-  <div class="menu-btn-list">
-    <span class="page-title-editor">{{ page_title }}</span>
-    <button id="openNav" class="text-button" @click="save()">保存</button>
-    <button id="openNav" class="text-button" @click="exitWithoutSave()">終了</button>
-
-    <input type="radio" id="btn_mode_view" name="view" class="nodisplay" value="mode_View" @click="setVisualMode()" >
-    <label for="btn_mode_view" class="editor-mode-label"><i class="fas fa-eye"></i></label>
-    
-    <input type="radio" id="btn_mode_both" name="view" class="nodisplay" value="mode_Both" @click="setVisualMode()" checked>
-    <label for="btn_mode_both" class="editor-mode-label"><i class="fas fa-columns"></i> </label>
-
-    <input type="radio" id="btn_mode_edit" name="view" class="nodisplay" value="mode_Edit" @click="setVisualMode()">
-    <label for="btn_mode_edit" class="editor-mode-label"><i class="fas fa-pen-nib"></i></label>
-  </div>
-</div>
+<component :is="'script'" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/codemirror.min.js"></component>
+<component :is="'script'" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/addon/mode/overlay.min.js"></component>
+<component :is="'script'" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/mode/markdown/markdown.min.js"></component>
+<component :is="'script'" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/mode/gfm/gfm.min.js"></component>
+<component :is="'script'" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.18.2/addon/edit/continuelist.min.js"></component>
+<component :is="'script'" src="http://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></component>
 
 <main  class="main" id="main">
 <div class="editor">
@@ -32,30 +22,27 @@
 <div class="preview">
 <iframe id="preview"></iframe>
 </div>
-<div style="clear:both;"></div>
 </main>
-<EditorSidebar />
 
 </section>
 </template>
 
 <script setup lang="ts">
 const route = useRoute()
-const page_title= route.params?.id || "";
+const page_title= "【PA】REAPERの日本語化";
 const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
 const page = data.value;
 </script>
 
 
 <script lang="ts">
-import md2html from '../../backend/md';
+import md2html from '../backend/md';
 
 export default {
   data(){
     return  {
       render:{loader: true},
       username: "test",
-      page_title: this.$route.params?.id || "",
       editable : true,
 
       ctx:{
@@ -73,29 +60,11 @@ export default {
     this.setDefaultText();
   },
   methods:{
-    updatePreview : function() {
-      let md = this.ctx.cm.getValue();
-      this.ctx.preview.contentWindow.document.open();
-      this.ctx.preview.contentWindow.document.write(md2html(md));
-      this.ctx.preview.contentWindow.document.close();
-    },
-
-    save : async function() {
-      console.log("saves all!")
-      const title = this.page_title;
-      const result = await ("/api/page/set", {
-        method:"POST", headers: {'Content-Type': 'application/json'},
-        body:JSON.stringify({ title, content:this.ctx.cm.getValue() })
-      })
-      if (result.ok && result.status === 200) {MyMessage({msg:"上書き保存しました", duration:1500, type:"simple"})}
-      else {MyMessage({msg:"保存できなかった！！", duration:1500, type:"simple"})}
-      console.log("Done")
-    },
-
     setDefaultText : async function() {
       try {
         console.log("Getting page data.....")
-        await this.ctx.cm.setValue(this.page.content);
+        /* await this.ctx.cm.setValue(this.page.content); */
+        this.ctx.cm.setValue(this.page?.content || "");
         this.render.loader = false;
       } catch (e: any) {
         console.log("Error: ", e)
@@ -105,7 +74,8 @@ export default {
     setup_cm: function(){
       this.ctx.cm = CodeMirror.fromTextArea(this.ctx.editor, {
           /* styleActiveLine: true, */
-          mode: 'text/markdown',
+          /* mode: 'text/markdown', */
+          mode: 'markdown',
           theme: 'monokai',
           lineNumbers: true,
           // KeyMap : "vim",
@@ -119,78 +89,12 @@ export default {
           /* /1* // theme: "default", *1/ */
           /* extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"} */
       });
-      this.ctx.cm.setSize("100%", "100%");
-      return true;
-
-      this.ctx.cm.on('change', (vm: any, e: any)=> {
-        this.updatePreview();
-      });
-
-      this.ctx.cm.on("drop", async(cm: any, e :any) => {
-        console.log(e);
-        let data = new FormData();
-        let files = e.dataTransfer.files;
-        let len = 0;
-        for(let i=0; i<files.length; i++){
-          const extention = files[i].name.split('.').pop().toLowerCase();
-          console.log(extention)
-          if(["jpg", "gif", "bmp", "png", "mp4", "mp3", "wav", "ogg", "pdf", "bin"].indexOf(extention) >= 0){
-            data.append("file", files[i]);
-            console.log("Add file")
-            len += 1;
-          }
-        }
-        if(len > 0){
-          const response =  await fetch("/upload", {
-            method:"POST",
-            body:data
-          })
-          if(response.ok){
-            MyMessage({msg:"アップロード完了"})
-            let result = await response.json();
-            console.log(result);
-            var start_cursor = this.ctx.cm.getCursor();  //I need to get the cursor position
-            this.ctx.cm.replaceSelection(`![${result.originalfilename}](/file/${result.filename})`);
-          }else{
-            MyMessage({msg:"アップロード失敗"})
-          }
-          // var xhr = new XMLHttpRequest();
-          // xhr.open("post", "/upload", true);
-          // xhr.onreadystatechange = function(){
-          //      if (xhr.readyState === 4){ // 通信終了
-          //         let result = JSON.parse(xhr.responseText);
-          //         alert(result);
-          //         var start_cursor = cm.getCursor();  //I need to get the cursor position
-          //         console.log(start_cursor);  //Cursor position 
-          //         cm.replaceSelection(`![${result.originalfilename}](/file/${result.filename})`);
-          //      }
-          //  };
-          //  xhr.send(data);
-        }
-      })
     }
   }
 }
 </script>
 
 <style >
-section{
-  background:#000;
-  z-index:100;
-  width: auto; 
-  top:80px;
-  position:fixed;
-  height:calc(100% - 80px);
-  /* margin:10px; */
-  width: auto;
-  /* overflow:hidden; */
-}
-
-.editor-menu{
-  height:50px;
-  width:100%;
-}
-
 main{
   width:100%;
   height:100%;
@@ -229,6 +133,12 @@ main{
 /*----------------------------------------------------------
                     Codemirror Settings
 ----------------------------------------------------------*/
+.CodeMirror {
+    font-size: 15px;
+    width: 100%, ;
+    height: 100%;
+  }
+
 .CodeMirror-scroll { 
   height: 100%; overflow-y: hidden; overflow-x: auto;
 }

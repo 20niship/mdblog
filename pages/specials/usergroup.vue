@@ -4,7 +4,7 @@
   <h1>You are not admin user</h1>
   <h2>Please login as an admin user</h2>
 </div>
-    <p>グループ数：{{ relation_data.length }}</p>
+    <p>グループ数：{{ usergroup.length }}</p>
     <p>theadをクリックすると、その値でソートできます。</p>
 
     <h2>グループ作成</h2>
@@ -113,6 +113,14 @@ const usergroup = [];
 
 <script lang="ts">
 export default {
+  data(){
+    /* const {data: user_list_} = await useFetch("/api/user/list", {method:"POST"}); */
+    return {
+      title: "title",
+      error: {},
+      usergroup:[]
+    }
+  },
   methods:{
       delete_user_from_group : async(user_id : any, group_id : any) => {
         if (window.confirm("ユーザー" + user_id.toString() + "をグループ" + group_id + "から削除しますか？")) {

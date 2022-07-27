@@ -15,9 +15,10 @@
 
   <div class="page-title-wrapper"><span class="page-title">{{ page.title }} </span></div>
   <div :v-if="editable">
-    <input type="button" value="edit" onclick="window.location = window.location.pathname + '?action=edit';" class="text-button" />
-    <input type="button" value="new" onclick="{document.getElementById('popup-new-page').style.display = 'block';}" class="text-button" />
+    <input type="button" value="edit" @click="edit_page()" class="text-button" />
+    <input type="button" value="new" @click="new_page()" class="text-button" />
     <input type="button" value="delete" onclick="delete_this_page()" class="text-button" />
+
   </div>
   <div id="pagetop" style="width:0;height:0"></div>
   <div id="maintext">
@@ -28,33 +29,37 @@
 <div :v-if=render.goto_top id="goto-top"><span class="page-top-icon"><a href="#pagetop"> top </a></span></div>
 <div :v-if=render.lgtm> <label id="lgtm-btn" onclick="favorite()"><i class="fas fa-star" id="lgtm-btn-icon"></i><span  class="fa fa-stack-1x"><span>ふぁぼ</span></span></label></div>
 
+<CreateNewPage v-if="render.new_page_modal" :title=page_title :endcb=close_create_page :username=username />
 </section>
 </template>
 
 <script setup lang="ts">
 import md2html from '../../backend/md';
-
 const route = useRoute()
 const page_title= route.params?.id || "";
 const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
-console.log(data)
 const page = data.value;
-
 page.markdown = md2html(page.content);
-
-const render = {
-  goto_top : true,
-  lgtm : true
-};
-const editable = true;
 </script>
 
 
 <script lang="ts">
 export default {
-  mounted: () => {
+  data(){
+    return  {
+      render:{goto_top: true, lgtm : true, new_page_modal : false},
+      username: "test",
+      editable : true
+    }
+  },
+  mounted(){
     hljs.initHighlightingOnLoad();
-    console.log("highlight")
+  },
+
+  methods:{
+    edit_page: function(){  window.location = "/edit/" + this.page_title; },
+    new_page : function(){  this.render.new_page_modal = true; },
+    close_create_page : function(){this.render.new_page_modal= false;},
   }
 }
 </script>
@@ -311,7 +316,4 @@ pre{
 }
 
 .page-top-icon a{color:#000;}
-
-
-
 </style>

@@ -6,11 +6,26 @@ export interface Page {
   update: Date,
   created: Date,
   context: string,
-  icon : string,
-  lgbt : number,
-  published : boolean
+  icon: string,
+  lgbt: number,
+  published: boolean
 };
 
+export interface User {
+  id : number,
+  name : string,
+  email : string,
+  enabled : boolean,
+  password : string, //TODO,
+  register : Date,
+  editcount : number,
+  isadmin : boolean,
+}
+
+export interface Usergroup {
+  name : string,
+  users: number[],
+}
 
 export enum DBResponseStatus {
   OK = 0,
