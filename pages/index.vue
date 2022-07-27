@@ -1,10 +1,6 @@
 <template>
 <section>
-<h1>Hello</h1>
-<p>aaaa</p>
-<div v-for="page of pages"  :key="page._id">
-<PageCardLarge :page=page />
-</div>
+<Pagelist :pages=pages :total=100 class="page-list" />
 </section>
 </template>
 

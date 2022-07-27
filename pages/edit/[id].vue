@@ -2,10 +2,6 @@
 <section>
 <Loader v-if="render.loader" />
 <meta name="viewport" content="width=device-width,initial-scale=0.7,minimum-scale=0.7, maximum-scale=1.0" />
-<component :is="'script'" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.js"></component>
-<component :is="'script'" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/markdown/markdown.js" ></component>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" >
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/monokai.min.css" >
 
 <div class="editor-menu">
   <div class="menu-btn-list">
@@ -25,8 +21,17 @@
 </div>
 
 <main  class="main" id="main">
-<div class="editor">
-<textarea id="editor"></textarea>
+<div class="editor" id="editor">
+  <codemirror
+    v-model="markdown_txt"
+    placeholder="Code goes here..."
+    :style="{ height: '100%' }"
+    :autofocus="true"
+    :indent-with-tab="true"
+    :tab-size="2"
+    :extensions="extensions"
+    @change="updatePreview"
+  />
 </div>
 
 <div class="preview">
@@ -39,25 +44,27 @@
 </section>
 </template>
 
-<script setup lang="ts">
-const route = useRoute()
-const page_title= route.params?.id || "";
-const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
-const page = data.value;
-</script>
-
-
 <script lang="ts">
 import md2html from '../../backend/md';
+import { Codemirror } from 'vue-codemirror'
+import { markdown} from '@codemirror/lang-markdown'
+import { oneDark } from '@codemirror/theme-one-dark'
 
 export default {
+  components: { Codemirror },
+  setup : async function() {
+    const route = useRoute()
+    const page_title= route.params?.id || "";
+    const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
+    const page = data.value;
+    return {extensions : [ markdown(), oneDark ],page, page_title, markdown_txt:page.content}
+  },
   data(){
     return  {
       render:{loader: true},
       username: "test",
       page_title: this.$route.params?.id || "",
       editable : true,
-
       ctx:{
         editor:undefined,
         preview: undefined,
@@ -69,12 +76,13 @@ export default {
   mounted(){
     this.ctx.editor = document.getElementById("editor");
     this.ctx.preview= document.getElementById("preview");
-    this.setup_cm();
-    this.setDefaultText();
+    this.updatePreview();
+    this.render.loader = false; 
   },
+
   methods:{
     updatePreview : function() {
-      let md = this.ctx.cm.getValue();
+      const md = this.markdown_txt;
       this.ctx.preview.contentWindow.document.open();
       this.ctx.preview.contentWindow.document.write(md2html(md));
       this.ctx.preview.contentWindow.document.close();
@@ -83,97 +91,53 @@ export default {
     save : async function() {
       console.log("saves all!")
       const title = this.page_title;
+      const content= this.markdown_txt;
       const result = await ("/api/page/set", {
         method:"POST", headers: {'Content-Type': 'application/json'},
-        body:JSON.stringify({ title, content:this.ctx.cm.getValue() })
+        body:JSON.stringify({ title, content })
       })
-      if (result.ok && result.status === 200) {MyMessage({msg:"上書き保存しました", duration:1500, type:"simple"})}
-      else {MyMessage({msg:"保存できなかった！！", duration:1500, type:"simple"})}
+      if (result.ok && result.status === 200) 
+        Notifications( {group: 'foo',title: '',text: 'Hello user! This is a notification!'});
+      else 
+        Notifications( {group: 'foo',title: '',text: 'Hello user! This is a notification!'});
       console.log("Done")
     },
 
-    setDefaultText : async function() {
-      try {
-        console.log("Getting page data.....")
-        await this.ctx.cm.setValue(this.page.content);
-        this.render.loader = false;
-      } catch (e: any) {
-        console.log("Error: ", e)
+    ondrop : async function(cm : any, e: any){
+      console.log(e);
+      let data = new FormData();
+      let files = e.dataTransfer.files;
+      let len = 0;
+      for(let i=0; i<files.length; i++){
+        const extention = files[i].name.split('.').pop().toLowerCase();
+        console.log(extention)
+        if(["jpg", "gif", "bmp", "png", "mp4", "mp3", "wav", "ogg", "pdf", "bin"].indexOf(extention) >= 0){
+          data.append("file", files[i]);
+          console.log("Add file")
+          len += 1;
+        }
+      }
+      if(len > 0){
+        const response =  await fetch("/upload", {
+          method:"POST",
+          body:data
+        })
+        if(response.ok){
+          MyMessage({msg:"アップロード完了"})
+          let result = await response.json();
+          console.log(result);
+          var start_cursor = this.ctx.cm.getCursor();  //I need to get the cursor position
+          this.ctx.cm.replaceSelection(`![${result.originalfilename}](/file/${result.filename})`);
+        }else{
+          MyMessage({msg:"アップロード失敗"})
+        }
       }
     },
-
-    setup_cm: function(){
-      this.ctx.cm = CodeMirror.fromTextArea(this.ctx.editor, {
-          /* styleActiveLine: true, */
-          mode: 'text/markdown',
-          theme: 'monokai',
-          lineNumbers: true,
-          // KeyMap : "vim",
-          /* matchBrackets: true, */
-          /* showCursorWhenSelecting: true, */
-          /* highlightFormatting: true, */
-          /* fencedCodeBlockHighlighting:true, */
-          /* smartIndent:true, */
-          /* newlineAndIndentEnter : true, */
-          /* /1* lineWrapping: true, *1/ */
-          /* /1* // theme: "default", *1/ */
-          /* extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"} */
-      });
-      this.ctx.cm.setSize("100%", "100%");
-      return true;
-
-      this.ctx.cm.on('change', (vm: any, e: any)=> {
-        this.updatePreview();
-      });
-
-      this.ctx.cm.on("drop", async(cm: any, e :any) => {
-        console.log(e);
-        let data = new FormData();
-        let files = e.dataTransfer.files;
-        let len = 0;
-        for(let i=0; i<files.length; i++){
-          const extention = files[i].name.split('.').pop().toLowerCase();
-          console.log(extention)
-          if(["jpg", "gif", "bmp", "png", "mp4", "mp3", "wav", "ogg", "pdf", "bin"].indexOf(extention) >= 0){
-            data.append("file", files[i]);
-            console.log("Add file")
-            len += 1;
-          }
-        }
-        if(len > 0){
-          const response =  await fetch("/upload", {
-            method:"POST",
-            body:data
-          })
-          if(response.ok){
-            MyMessage({msg:"アップロード完了"})
-            let result = await response.json();
-            console.log(result);
-            var start_cursor = this.ctx.cm.getCursor();  //I need to get the cursor position
-            this.ctx.cm.replaceSelection(`![${result.originalfilename}](/file/${result.filename})`);
-          }else{
-            MyMessage({msg:"アップロード失敗"})
-          }
-          // var xhr = new XMLHttpRequest();
-          // xhr.open("post", "/upload", true);
-          // xhr.onreadystatechange = function(){
-          //      if (xhr.readyState === 4){ // 通信終了
-          //         let result = JSON.parse(xhr.responseText);
-          //         alert(result);
-          //         var start_cursor = cm.getCursor();  //I need to get the cursor position
-          //         console.log(start_cursor);  //Cursor position 
-          //         cm.replaceSelection(`![${result.originalfilename}](/file/${result.filename})`);
-          //      }
-          //  };
-          //  xhr.send(data);
-        }
-      })
-    }
   }
 }
 </script>
 
-<style >
+<style scoped>
 section{
   background:#000;
   z-index:100;
