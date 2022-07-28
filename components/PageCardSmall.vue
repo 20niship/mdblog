@@ -1,6 +1,6 @@
 <template>
 <div class="card">
-<a :href='"/view/" + page.title'><img :src=page.icon :alt=title class="card-thumb" onerror="this.classList.add('undefined-img')"></a>
+<a :href='"/view/" + page.title'><img :src=page.icon :alt=page.title class="card-thumb" onerror="this.classList.add('undefined-img')"></a>
 <p class="card-title"><a :href='"/view/" + page.title'>{{page.title}}</a></p>
 <Tags :tag=page.tag />
 </div>

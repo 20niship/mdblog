@@ -16,8 +16,8 @@ export interface User {
   name : string,
   email : string,
   enabled : boolean,
-  password : string, //TODO,
-  register : Date,
+  password ?: string, //TODO,
+  register : Date | number,
   editcount : number,
   isadmin : boolean,
 }

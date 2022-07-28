@@ -24,6 +24,7 @@
       <thead>
         <tr>
           <td class="sort" data-sort="td_url">url</td>
+          <td>Thumbnail</td>
           <td class="sort" data-sort="td_title">title</td>
           <td class="sort" data-sort="td_username">username</td>
           <td class="sort" data-sort="td_c_time">created at</td>
@@ -36,18 +37,28 @@
       </thead>
       <tbody id="datatable" class="list">
           <tr v-for="p in pages">
-            <td class="td_url"><a :href="'/view/'+ p.url">{{p.url}}</a></td>
-            <td class="td_title"><a :href="'/view/' + p.url">{{p.title}}</a></td>
+            <td class="td_url"><a :href="'/view/'+ p.title">{{p.url}}</a></td>
+            <td><a :href="'/view/'+ p.title"><img :src=p.icon width=50 ></a></td>
+            <td class="td_title"><a :href="'/view/' + p.title">{{p.title}}</a></td>
             <td class="td_title">{{ p.user }}</td>
             <td class="td_c_time">{{ p.created }}</td>
-            <td class="td_u_time">{{ p.update}}</td>
+            <td class="td_u_time">{{ p.updated }}</td>
             <td class="td_tag">{{ p.tag }} </td>
-            <td class="td_u_time">{{ p.content }}</td>
+            <td class="td_u_time">{{ p.content.substr(0, 100) }}</td>
             <td><button @click="delete_page(p.url)">削除</button></td>
             <td><button @click="rename_page( p.url)">Rename</button></td>
           </tr>
       </tbody>
     </table>
+
+    
+  <h1>Tag List</h1>
+  <table >
+  <thead><tr><td>Tag</td><td>Count</td></tr></thead>
+  <tbody>
+  <tr v-for="t of tags"><td>{{t._id[0]}}</td><td>{{t.count}}</td></tr>
+  </tbody>
+  </table>
 </template>
 
 
@@ -55,8 +66,15 @@
 const title = "title";
 const data = await useFetch('/api/page/search', {method:"POST", body:{type:"list"}})
 const pages = data.data;
-const error = {}
 
+const tagdata = await useFetch('/api/category', {method:"POST", body:{type:"list"}})
+const tags = tagdata.data.value?.tags;
+
+const error = {}
 </script>
 
-
+<style scoped>
+table{
+  max-width:90%;
+}
+</style>

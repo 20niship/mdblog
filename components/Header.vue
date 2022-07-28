@@ -74,11 +74,11 @@
             <input type="checkbox" id="show-h-menu-6" role="button">
             <label for="show-h-menu-6" class="show-header-menu-child-label">System</label>
             <ul>
-              <li><a href="/special/performance">プロファイリング</a></li>
-              <li><a href="/special/config">About</a> </li>
-              <li><a href="/special/config/user">ユーザー設定</a> </li>
-              <li><a href="/special/config/usergroup">グループ設定</a></li>
-              <li><a href="/special/config/page">/ページ設定</a> </li>
+              <li><a href="/specials/performance">Performance</a></li>
+              <li><a href="/specials/user">User Settings</a></li>
+              <li><a href="/specials/usergroup">Usergroup Settings</a> </li>
+              <li><a href="/specials/page">ページ設定</a> </li>
+              <li><a href="/specials/admin">Admin</a> </li>
             </ul>
           </li>
           </ul>
@@ -87,7 +87,6 @@
     </div>
   </header>
 </template>
-
 
 <style soped>
 .h_title {
@@ -111,6 +110,7 @@ header {
   padding-left: 20px;
   z-index:5;
   width:100%;
+  margin-bottom:15px;
 }
 
 .header_start {
