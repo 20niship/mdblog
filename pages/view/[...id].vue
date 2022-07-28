@@ -50,8 +50,6 @@ const page_title= t.join("/");
 const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
 const page = data?.value || undefined;
 const found = page != undefined;
-console.log(found)
-console.log(page)
 if(found){
 page.markdown = md2html(page.content);
 }

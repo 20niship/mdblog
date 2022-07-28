@@ -1,5 +1,7 @@
 <template>  
 <div class="sidebar">
+  <SimpleSearch class="sidebar-item" /> 
+  <About class="sidebar-item" /> 
   <AllTags class="sidebar-item" />
   <Latest class="sidebar-item" />
 </div>

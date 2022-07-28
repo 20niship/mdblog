@@ -105,11 +105,7 @@
 .h_desc{ padding-left:0.7rem;font-size: 1.1rem;}
 
 header {
-  /* position: fixed; */
-  /* top: 0; */
-  /* left: 50%; */
-  /* transform: translate(-50%, 0%); */
-  background-color: #222; 
+  background-color:#223; 
   height:60px;
   padding-top: 10px;
   padding-left: 20px;
@@ -190,7 +186,7 @@ header {
   z-index: 1;
   left:0;
   right:0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: #223; 
   transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
 }
@@ -254,14 +250,13 @@ header {
 .h_nav_wrapper li:hover li a:focus,
 .h_nav_wrapper li:hover li:hover a,
 .h_nav_wrapper li:hover li:hover li a {
-  background: #444;
+  background: #666;
 }
 
-.h_nav_wrapper li:hover li:hover li a:hover,
-.h_nav_wrapper li:hover li:hover li:hover a {
-  background: #333;
+.h_nav_wrapper li:hover li a{
+  background-color:#000;
+  box-shadow: 0 10px 25px 0 rgba(100, 100, 255, .2);
 }
-
 
 .h_search {
   display: flex;
@@ -437,7 +432,6 @@ header {
 </style>
 
 <script setup lang="ts">
-
 const title = "Title";
 const description = "description";
 const logined =false;

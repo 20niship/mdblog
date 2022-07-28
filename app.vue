@@ -97,7 +97,6 @@ tbody tr:hover td{
   content:"▲";
 }
 
-
 pre{
   padding: 0px;
   overflow-x: scroll;
@@ -107,7 +106,6 @@ pre{
   width:96%;
   scrollbar-base-color: #eee;
 }
-
 
 .title_list_table,
 .title_list_table td,

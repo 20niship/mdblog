@@ -10,7 +10,6 @@ export default defineEventHandler(async (event) => {
     const aggCursor = col.aggregate(pipeline);
     let res = [];
     for await (const doc of aggCursor || []) res.push(doc);
-    console.log("aa" , res);
     return { tags: res }
   } catch {
     console.error("JSON Parse error, input = ", event.req.body)

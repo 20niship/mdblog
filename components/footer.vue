@@ -14,7 +14,7 @@
 footer {
   margin: 0;
   padding: 5px;
-  background-color: #000;
+  background-color:#223; 
   color: #000;
   text-align: center;
   width: 100%;
@@ -23,7 +23,7 @@ footer {
 
 footer *{ color:#fff; }
 
-ul.footer-menu li a {
+.footer-menu li a {
   font-weight: bold;
   font-size: 1.2rem;
   text-decoration: none;
@@ -57,5 +57,4 @@ ul.footer-menu li {
         display: inline;
     }
 }
-
 </style>

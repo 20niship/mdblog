@@ -64,7 +64,7 @@ export default {
 
 .page-desc{
   font-size: 0.9rem;
-  color:#eee;
+  color:#aab;
   text-decoration: none;
   padding-top:0px;
   margin:3px;
