@@ -99,11 +99,12 @@ tbody tr:hover td{
 
 
 pre{
-  width:100%;
   padding: 0px;
   overflow-x: scroll;
-  border : solid 1px #fff;
-  padding:10px;
+  border : solid 1px #aaa;
+  border-radius:4px;
+  padding:6px;
+  width:96%;
   scrollbar-base-color: #eee;
 }
 
@@ -124,15 +125,6 @@ pre{
     overflow-x: scroll;
     border:solid 1px #fff;
   }
-}
-
-pre{
-  width:100%;
-  padding: 0px;
-  overflow-x: scroll;
-  border : solid 1px #fff;
-  padding:10px;
-  scrollbar-base-color: #eee;
 }
 
 </style>

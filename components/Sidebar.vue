@@ -1,9 +1,7 @@
 <template>  
-<div >
+<div class="sidebar">
   <AllTags class="sidebar-item" />
-  <p>aaaaaaaaaaaa</p>
-  <p>aaaaaaaaaaaa</p>
-  <p>aaaaaaaaaaaa</p>
+  <Latest class="sidebar-item" />
 </div>
 </template>
 
@@ -15,6 +13,10 @@
   margin:10px;
   border-radius:15px;
   border: solid 0.1px #444;
+}
+
+.sidebar{
+  max-width:300px;
 }
 </style>
 

@@ -63,7 +63,9 @@ onMounted(() => {hljs.initHighlightingOnLoad();});
 .main-wrapper{
   max-width: 1500px;
   margin: auto;
-  display:flex;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
 }
 
 .page-status, 
