@@ -23,7 +23,7 @@
 <main  class="main" id="main">
 <div class="editor" id="editor">
   <codemirror
-    v-model="markdown_txt"
+    v-model=markdown_txt
     placeholder="Code goes here..."
     :style="{ height: '100%' }"
     :autofocus="true"
@@ -44,96 +44,62 @@
 </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import md2html from '../../backend/md';
 import { Codemirror } from 'vue-codemirror'
 import { markdown} from '@codemirror/lang-markdown'
 import { oneDark } from '@codemirror/theme-one-dark'
 
-export default {
-  components: { Codemirror },
-  setup : async function() {
-    const route = useRoute()
-    const page_title= route.params?.id || "";
-    const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
-    const page = data.value;
-    return {extensions : [ markdown(), oneDark ],page, page_title, markdown_txt:page.content}
-  },
-  data(){
-    return  {
-      render:{loader: true},
-      username: "test",
-      page_title: this.$route.params?.id || "",
-      editable : true,
-      ctx:{
-        editor:undefined,
-        preview: undefined,
-        cm: undefined,
-      }
-    }
-  },
-  
-  mounted(){
-    this.ctx.editor = document.getElementById("editor");
-    this.ctx.preview= document.getElementById("preview");
-    this.updatePreview();
-    this.render.loader = false; 
-  },
+const route = useRoute()
+const t= route.params?.id || "";
+const page_title= t.join("/");
+const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
+let page = data?.value || undefined;
+const found = page != undefined;
+let markdown_txt = ref(found ? page.content : "");
+page.markdown = markdown_txt;
+let render = reactive({loader: true});
+const extensions = [markdown(), oneDark];
+const ctx = {
+  editor:undefined,
+  preview: undefined,
+  cm: undefined,
+}
 
-  methods:{
-    updatePreview : function() {
-      const md = this.markdown_txt;
-      this.ctx.preview.contentWindow.document.open();
-      this.ctx.preview.contentWindow.document.write(md2html(md));
-      this.ctx.preview.contentWindow.document.close();
-    },
+onMounted(function(){
+  ctx.editor = document.getElementById("editor");
+  ctx.preview= document.getElementById("preview");
+  updatePreview();
+  render.loader = false; 
+})
 
-    save : async function() {
-      console.log("saves all!")
-      const title = this.page_title;
-      const content= this.markdown_txt;
-      const result = await ("/api/page/set", {
-        method:"POST", headers: {'Content-Type': 'application/json'},
-        body:JSON.stringify({ title, content })
-      })
-      if (result.ok && result.status === 200) 
-        Notifications( {group: 'foo',title: '',text: 'Hello user! This is a notification!'});
-      else 
-        Notifications( {group: 'foo',title: '',text: 'Hello user! This is a notification!'});
-      console.log("Done")
-    },
+const updatePreview = function() {
+  const md = markdown_txt.value;
+  ctx.preview.contentWindow.document.open();
+  ctx.preview.contentWindow.document.write(md2html(md));
+  ctx.preview.contentWindow.document.close();
+}
 
-    ondrop : async function(cm : any, e: any){
-      console.log(e);
-      let data = new FormData();
-      let files = e.dataTransfer.files;
-      let len = 0;
-      for(let i=0; i<files.length; i++){
-        const extention = files[i].name.split('.').pop().toLowerCase();
-        console.log(extention)
-        if(["jpg", "gif", "bmp", "png", "mp4", "mp3", "wav", "ogg", "pdf", "bin"].indexOf(extention) >= 0){
-          data.append("file", files[i]);
-          console.log("Add file")
-          len += 1;
-        }
-      }
-      if(len > 0){
-        const response =  await fetch("/upload", {
-          method:"POST",
-          body:data
-        })
-        if(response.ok){
-          MyMessage({msg:"アップロード完了"})
-          let result = await response.json();
-          console.log(result);
-          var start_cursor = this.ctx.cm.getCursor();  //I need to get the cursor position
-          this.ctx.cm.replaceSelection(`![${result.originalfilename}](/file/${result.filename})`);
-        }else{
-          MyMessage({msg:"アップロード失敗"})
-        }
-      }
-    },
-  }
+const save = async function() {
+  console.log("saves all!")
+  const title = page_title;
+  const content= markdown_txt;
+  const result = await $fetch("/api/page/set", {
+    method:"POST", /*headers: {'Content-Type': 'application/json'},*/
+    body:{ title, content }
+  })
+  if (result.ok && result.status === 200) 
+    Notifications( {group: 'foo',title: '',text: 'Hello user! This is a notification!'});
+  else 
+    Notifications( {group: 'foo',title: '',text: 'Hello user! This is a notification!'});
+  console.log("Done")
+}
+
+const ondrop =async function(cm : any, e: any){
+  console.log(e);
+  let data = new FormData();
+  let files = e.dataTransfer.files;
+  let len = 0;
 }
 </script>
 

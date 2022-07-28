@@ -4,11 +4,15 @@ export default defineEventHandler(async (event) => {
   console.log(event.req.body);
   try {
     const body = JSON.parse(event.req.body) || {};
-    if (body.url != undefined) { return mongo.get_page_by_url(body.url); }
-    if (body.title != undefined) { return await mongo.get_page_by_title(body.title); }
-    if (body.id != undefined) { return await mongo.get_page_by_id(body.id); }
+    let page :any = {};
+    console.log(body)
+    if (body.url != undefined) { page = await mongo.get_page_by_url(body.url)[0]; }
+    if (body.title != undefined) { page = await mongo.get_page_by_title(body.title); }
+    if (body.id != undefined) { page = await mongo.get_page_by_id(body.id)[0]; }
+
+    console.log("page = ", page)
+    return page[0];
     console.error("Undefined get method! title / id / url")
-    return {};
   }catch{
     console.error("JSON Parse error, input = ", event.req.body)
     return {}

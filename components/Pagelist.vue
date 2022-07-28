@@ -1,15 +1,13 @@
 <template>
 <section>
-<div v-for="page of pages" class="page-list">
-  <div class="page-view">
+  <div class="page-view" v-for="page of pages">
     <div class="thumb-wrapper"> <img :src=page.icon :alt=title class="thumb" onerror="this.classList.add('undefined-img')" /></div>
     <div>
       <p class="page-title"><a :href='"/view/" + page.title'>{{page.title}}</a></p>
-      <a :href='"/search?d=" + page.create' class="date"><i class="fas fa-clock icon"></i>{{ format_date(new Date(page.created)) }}</a>
-      <a :href='"/search?d=" + page.update' class="date"><i class="fas fa-code-branch"></i>{{format_date(new Date(page.updated)) }}</a>
+      <Date :date=page.created />
+      <Date :date=page.updated />
       <a v-for="t in page.tag" :href='"/search?c=" + t' class="category">{{t}}</a>
       <p class="page-desc"> {{page.content}}</p>
-  </div>
   </div>
 </div>
 </section>
@@ -18,38 +16,25 @@
 <script lang="ts">
 export default {
   props: ["pages", "total", "page"],
-  data(){
-    return {
-    }
-  },
-  methods:{
-    format_date: function(dt: Date){
-      try{
-        const y = dt.getFullYear();
-        const m = ('00' + (dt.getMonth()+1)).slice(-2);
-        const d = ('00' + dt.getDate()).slice(-2);
-        return (y + '-' + m + '-' + d);
-      }catch{
-        console.log("ERROR unkown datetime", dt)
-        return "0000-00-00"
-      }
-    }
- }
 }
 </script>
 
 <style scoped>
 .page-view{
   margin:0px 0px 15px 0px;
-  width: 90%;
-  max-width: 800px;
-  height: 180px;
+  height: 150px;
   overflow: hidden;
   position: relative;
   border-radius: 15px;
   border: solid 1px #aaa;
   padding : 11px;
   display:flex;
+
+  background-color:#223;
+  padding:10px;
+  margin:20px;
+  border-radius:15px;
+  border: solid 0.1px #444;
 }
 
 .thumb-wrapper{

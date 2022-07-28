@@ -1,6 +1,6 @@
 <template>
  <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
-<div v-if="error.msg != undefined">
+<div v-if="error?.msg != undefined">
   <h1>You are not admin user</h1>
   <h2>Please login as an admin user</h2>
 </div>
@@ -35,7 +35,7 @@
         </tr>
       </thead>
       <tbody id="datatable" class="list">
-          <tr v-for="p in page">
+          <tr v-for="p in pages">
             <td class="td_url"><a :href="'/view/'+ p.url">{{p.url}}</a></td>
             <td class="td_title"><a :href="'/view/' + p.url">{{p.title}}</a></td>
             <td class="td_title">{{ p.user }}</td>
@@ -55,6 +55,7 @@
 const title = "title";
 const data = await useFetch('/api/page/search', {method:"POST", body:{type:"list"}})
 const pages = data.data;
+const error = {}
 
 </script>
 

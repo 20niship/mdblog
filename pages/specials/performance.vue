@@ -332,7 +332,6 @@ setInterval(update, 800);
 
 
 <style scoped>
-
 html, body, main{width:100%;}
 .chart-wrapper h1{
   font-size: 1.4rem;

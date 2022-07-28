@@ -90,22 +90,6 @@
 
 
 <style soped>
-body {
-  background-color: #333333;
-  width:100%;height:100vh;
-  color: #fff;
-  padding-left:3px;
-  padding-right:10px;
-}
-*{font-size:1.0rem; font-family:'arial';}
-a {color:rgb(219, 241, 250);;text-decoration: underline;}
-a:visited {color: rgb(159, 228, 255);}
-a:hover {font-weight: bold;}
-
-
-/*  ###################################
-   #####       ヘッダー        #######
-   ###################################*/
 .h_title {
   font-weight: bold;
   font-size: 1.8rem; 

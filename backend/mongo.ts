@@ -22,18 +22,18 @@ export const connect = async () => {
 }
 
 export const page_list = async () => {
-  return await collections.pages?.find({}).toArray();
+ return await collections.pages?.find({}).skip(0).limit(20).toArray();
+  // return await collections.pages?.find({}, {content: {$substrCP: [0,50]}).toArray();
 }
 
 export const get_page_by_url = async (url: string) => {
-  return (await collections.pages?.find({ url }).toArray());
+  return await collections.pages?.find({ url }).toArray();
 }
 export const get_page_by_id = async (id: number) => {
-  return (await collections.pages?.find({ id }).toArray());
+  return await collections.pages?.find({ id }).toArray();
 }
 export const get_page_by_title = async (title: string) => {
-  const pages = await collections.pages?.find({ title }).toArray();
-  return pages[0];
+  return await collections.pages?.find({ title }).toArray();
 }
 
 
