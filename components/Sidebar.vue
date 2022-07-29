@@ -1,9 +1,27 @@
 <template>  
 <div class="sidebar">
-  <SimpleSearch class="sidebar-item" /> 
-  <About class="sidebar-item" /> 
-  <AllTags class="sidebar-item" />
-  <Latest class="sidebar-item" />
+
+<div class="sidebar-item">
+   <p class="sidebar-item-title">記事を検索</p>
+  <SimpleSearch /> 
+</div>
+
+<div class="sidebar-item">
+   <p class="sidebar-item-title">About</p>
+  <About /> 
+  <Graph />
+   <p class="sidebar-item-title">更新頻度</p>
+  <Grass />
+</div>
+<div class="sidebar-item">
+   <p class="sidebar-item-title">カテゴリー覧</p>
+  <AllTags />
+</div>
+<div class="sidebar-item">
+   <p class="sidebar-item-title">最新記事</p>
+  <Latest />
+</div>
+
 </div>
 </template>
 
@@ -19,6 +37,13 @@
 
 .sidebar{
   max-width:300px;
+}
+
+.sidebar-item-title{
+  font-weight:bold;
+  text-align:center;
+  margin:7px;
+  font-size:1.1rem;
 }
 </style>
 

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-const data = await useFetch('/api/category', {method:"POST", body:{type:"list"}})
+const data = await useFetch('/api/stats', {method:"POST", body:{query:"all_tags"}})
 const all_tags = data.data.value?.tags;
 const all_tags_string= all_tags.map(x => x._id[0]);
 </script>

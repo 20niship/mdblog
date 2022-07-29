@@ -61,6 +61,18 @@ export const count_pages = async () => {
   return res;
 }
 
+export const page_month_stats = async () => {
+  const pipeline = [
+    { $match: {} },
+    { $group: { _id: { $dateToString: { date: "$created", format: "%Y-%m" } }, count: { $sum: 1 } } }
+  ];
+  const aggCursor = collections.pages?.aggregate(pipeline);
+  let res = [];
+  for await (const doc of aggCursor || []) res.push(doc);
+  console.log(res)
+  return res;
+}
+
 /* ----------------   User Functions ----------------------  */
 export const get_all_users = async () => {
   const res = await collections.users?.find({}).toArray();

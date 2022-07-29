@@ -23,6 +23,8 @@
     "@codemirror/theme-one-dark": "^6.0.0",
     "codemirror": "^6.0.1",
     "vue-codemirror": "^6.0.1",
-    "vue-notification": "latest"
+    "vue-notification": "latest",
+    "vue-chartjs": "latest",
+    "chart.js": "latest"
   }
 }

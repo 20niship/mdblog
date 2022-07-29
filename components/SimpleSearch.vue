@@ -1,7 +1,6 @@
 <template>
 <div>
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-<p>キーワード検索</p>
 <form method="get" action="#" class="search_container">
   <input type="text" size="25" placeholder="キーワード検索">
   <input type="submit" value="&#xf002">
