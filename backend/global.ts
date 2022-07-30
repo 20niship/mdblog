@@ -1,4 +1,5 @@
 export interface Page {
+  _id : string,
   id: number,
   title: string,
   tag: string[],
@@ -12,6 +13,7 @@ export interface Page {
 };
 
 export interface User {
+  _id : string,
   id : number,
   name : string,
   email : string,
@@ -23,6 +25,7 @@ export interface User {
 }
 
 export interface Usergroup {
+  _id : string,
   name : string,
   users: number[],
 }

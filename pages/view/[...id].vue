@@ -47,8 +47,10 @@ const editable =true;
 const route = useRoute()
 const t= route.params?.id || "";
 const page_title= t.join("/");
-const { data }= await useFetch("/api/page/get", { method:"POST", body:{title: page_title} })
+console.log("Fetching.......................")
+const { data }= await useFetch("/api/page", {method:"POST", body:{title:page_title}})
 const page = data?.value || undefined;
+console.log(page)
 const found = page != undefined;
 if(found){
 page.markdown = md2html(page.content);

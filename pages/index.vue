@@ -5,7 +5,7 @@
 </div>
 </template>
 <script setup lang="ts">
-const data = await useFetch('/api/page/search', {method:"POST", body:{type:"list"}})
+const data = await useFetch('/api/search', {method:"GET", body:{type:"latest"}})
 const pages = data.data;
 </script>
 

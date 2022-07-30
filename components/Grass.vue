@@ -29,7 +29,6 @@ let d :number[][] = [];
 for(const a of agg){
   const year_offset = get_year(a._id) - min_year;
   const month = get_month(a._id);
-  console.log(year_offset, month)
   if(d[year_offset]==undefined) d[year_offset] = [];
   d[year_offset][month-1] = a.count / max_commit;
 }

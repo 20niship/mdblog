@@ -30,22 +30,25 @@ export const connect = async () => {
 
 /* ----------------   Page Functions ----------------------  */
 
-export const page_list = async () => {
-  return await collections.pages?.find({}).skip(0).limit(20).toArray();
+export const page_list = async (page: number, limit: number) => {
+  return await collections.pages?.find({}).skip(page * limit).limit(limit).toArray();
 }
 
-export const get_page_by_url = async (url: string) => {
-  return await collections.pages?.find({ url }).toArray();
-}
-export const get_page_by_id = async (id: number) => {
-  return await collections.pages?.find({ id }).toArray();
+export const get_page_by_id = async (_id: number) => {
+  return await collections.pages?.find({ _id }).toArray();
 }
 export const get_page_by_title = async (title: string) => {
   return await collections.pages?.find({ title }).toArray();
 }
 
 export const insert_ppage = async (page: Page) => {
-  return await collections.pages?.insertOne(page)
+  const res = await collections.pages?.insertOne(page)
+  return res?.acknowledged || false;
+}
+
+export const edit_page = async (_id: string, page: Page) => {
+  const res = await collections.pages?.updateOne({ _id }, page);
+  return res?.acknowledged || false;
 }
 
 export const delete_all_pages = async () => {
@@ -57,7 +60,6 @@ export const delete_all_pages = async () => {
 // users.deletemany({}) // 全データ削除
 export const count_pages = async () => {
   const res = await collections.pages?.count({});
-  console.log("count = ", res);
   return res;
 }
 
@@ -69,7 +71,6 @@ export const page_month_stats = async () => {
   const aggCursor = collections.pages?.aggregate(pipeline);
   let res = [];
   for await (const doc of aggCursor || []) res.push(doc);
-  console.log(res)
   return res;
 }
 
