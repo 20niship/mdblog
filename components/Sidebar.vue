@@ -9,7 +9,6 @@
 <div class="sidebar-item">
    <p class="sidebar-item-title">About</p>
   <About /> 
-  <Graph />
    <p class="sidebar-item-title">更新頻度</p>
   <Grass />
 </div>

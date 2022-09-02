@@ -1,5 +1,4 @@
 import * as mongo from "../../backend/mongo";
-import * as mongo from "../../backend/mongo";
 import { useBody } from 'h3'
 
 export default async (req, res) => {
@@ -24,7 +23,7 @@ export default async (req, res) => {
           { $match: {} },
           { $group: { _id: "$tag", count: { $sum: 1 } } }
         ];
-        const aggCursor = col.aggregate(pipeline);
+        const aggCursor = col?.aggregate(pipeline);
         let res = [];
         for await (const doc of aggCursor || []) res.push(doc);
         return { tags: res }

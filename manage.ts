@@ -1,5 +1,4 @@
 import fs from 'fs';
-import readline from 'readline';
 import process from 'node:process';
 import * as db from "./backend/mongo"
 import { Page, User, Usergroup } from "./backend/global"
@@ -12,34 +11,6 @@ process.on('uncaughtException', function(err) {
 const sleep = (msec: number) => new Promise(resolve => setTimeout(resolve, msec));
 
 const json_file = "../nodejs/hatena_to_markdown_js/output.json";
-
-/*
-const insert_pages = async () => {
-  console.log("---------     insert items start -------------------")
-  const stream = fs.createReadStream(json_file);
-  const rl = readline.createInterface({
-    input: stream
-  });
-  const insert_data = async (dataset: Page[]) => {
-  }
-  let dataset: Page[] = [];
-  let iter = 0;
-  for await (const line of rl) {
-    // const line2 = line.replace(/\bNaN\b/g, "null").replace(/(<([^>]+)>)/gi, "").replace("\n", " ").replace("<br>", " ");
-    try {
-      let body: Page = JSON.parse(line);
-      dataset.push(body);
-      console.log("page " , iter, body.title)
-      iter++;
-    } catch (err: any) {
-      console.log(err)
-    }
-  }
-  console.log("inserting...")
-  await db.collections.pages?.insertMany(dataset);
-  console.log("Done!")
-}
-*/
 
 const insert_pages = async () => {
   console.log("---------     insert items start -------------------")
@@ -56,7 +27,7 @@ const insert_pages = async () => {
   console.log("inserting...")
   console.log("Page size = ", pages.length);
   for (let i = 0; i < 5; i++) console.log(pages[i].title);
-  await db.collections.pages?.insertMany(pages);
+  await db.collections.pages?.insertMany(pages as any);
   console.log("Done!")
 }
 
@@ -76,14 +47,13 @@ const insert_example_users = async () => {
     { id: 9, name: "19oj", register: Date.now(), editcount: 35, email: "0@gmail.com", enabled: true, isadmin: false },
     { id: 12, name: "18olinv", register: Date.now(), editcount: 8, email: "0@gmail.com", enabled: true, isadmin: false },
   ]
-  await db.collections.users?.insertMany(users);
-
+  await db.collections.users?.insertMany(users as any);
 
   const usergroups: Usergroup[] = [
     { name: "20er", users: [2, 3, 6, 10] },
     { name: "19er", users: [9, 8, 7] }
   ]
-  await db.collections.usergroups?.insertMany(usergroups);
+  await db.collections.usergroups?.insertMany(usergroups as any);
 }
 
 
@@ -93,8 +63,9 @@ const main = async () => {
   await db.delete_all_pages();
   await db.delete_all_users();
   await db.delete_all_usergroups();
-  await insert_pages();
+  // await insert_pages();
   await insert_example_users();
+  console.log("End!");
 }
 
 main()

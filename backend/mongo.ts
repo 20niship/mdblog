@@ -42,7 +42,7 @@ export const get_page_by_title = async (title: string) => {
 }
 
 export const insert_ppage = async (page: Page) => {
-  const res = await collections.pages?.insertOne(page)
+  const res = await collections.pages?.insertOne(page as any)
   return res?.acknowledged || false;
 }
 
@@ -95,7 +95,7 @@ export const put_user = async (user_: User) => {
   const count = await collections.users?.count({}) as number;
   let user = user_;
   user["id"] = count + 1;
-  const res = await collections.users?.insertOne(user);
+  const res = await collections.users?.insertOne(user as any);
   return res?.acknowledged || false;
 }
 
@@ -136,8 +136,5 @@ export const delete_all_usergroups = async () => {
 
 export const get_collections = () => { return collections; }
 
-const main = async () => {
-  connect();
-}
-
 connect();
+
