@@ -10,19 +10,33 @@ process.on('uncaughtException', function(err) {
 
 const sleep = (msec: number) => new Promise(resolve => setTimeout(resolve, msec));
 
-const json_file = "../nodejs/hatena_to_markdown_js/output.json";
+const json_file = "/home/test3/Downloads/output.json";
 
 const insert_pages = async () => {
   console.log("---------     insert items start -------------------")
   const txt = fs.readFileSync(json_file);
   console.log(txt.toString().slice(0, 200))
   const { page } = JSON.parse(txt.toString());
-  let pages: Page[] = [];
+  let pages: any[] = [];
+const getRandomInt = (max:number) =>  {
+    return Math.floor(Math.random() * max);
+  }
+
   for (let p of page) {
-    p.updated = new Date(p.updated);
-    p.created = new Date(p.created);
+    let page = {
+      update: new Date(p.update_time),
+      create: new Date(p.create_time),
+      id: getRandomInt(999999),
+      title: p.title,
+      context: p.content,
+      lgbt: 0,
+      published: true,
+      icon: p.icon,
+      user: 0,
+      tags: p.tag
+    };
     console.log(p)
-    pages.push(p);
+    pages.push(page);
   }
   console.log("inserting...")
   console.log("Page size = ", pages.length);
@@ -63,7 +77,7 @@ const main = async () => {
   await db.delete_all_pages();
   await db.delete_all_users();
   await db.delete_all_usergroups();
-  // await insert_pages();
+  await insert_pages();
   await insert_example_users();
   console.log("End!");
 }
